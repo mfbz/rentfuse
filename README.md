@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./rentfuse_banner.svg">
+  <img width="200" src="./rentfuse_icon.svg">
 </p>
 
 <h1 align="center">rentfuse</h1>

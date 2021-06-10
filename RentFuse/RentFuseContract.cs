@@ -11,7 +11,9 @@ namespace RentFuse
 {
 	[DisplayName("mfbz.RentFuseContract")]
 	[ManifestExtra("Author", "Michael Fabozzi")]
+	[ManifestExtra("Name", "RentFuseContract")]
 	[ManifestExtra("Description", "Peer to peer renting of Neo N3 NFTs")]
+	[ManifestExtra("Version", "1.0.0")]
 	public class RentFuseContract : SmartContract
 	{
 		private static StorageMap ContractStorage => new StorageMap(Storage.CurrentContext, "RentFuseContract");

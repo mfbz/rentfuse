@@ -35,6 +35,41 @@
       },
       "problemMatcher": "$msCompile",
       "dependsOn": "RentFuse: restore"
+    },
+    {
+      "options": {
+        "cwd": "${workspaceFolder}/DummyNFT"
+      },
+      "label": "DummyNFT: restore",
+      "command": "dotnet",
+      "type": "shell",
+      "args": [
+        "restore"
+      ],
+      "group": "build",
+      "presentation": {
+        "reveal": "silent"
+      },
+      "problemMatcher": []
+    },
+    {
+      "options": {
+        "cwd": "${workspaceFolder}/DummyNFT"
+      },
+      "label": "DummyNFT: build",
+      "command": "dotnet",
+      "type": "shell",
+      "args": [
+        "build",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "group": "build",
+      "presentation": {
+        "reveal": "silent"
+      },
+      "problemMatcher": "$msCompile",
+      "dependsOn": "DummyNFT: restore"
     }
   ]
 }

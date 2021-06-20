@@ -1,3 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512.001" height="512.002" viewBox="0 0 512.001 512.002">
-  <path id="icon" d="M-2909-2302h-512v-256h128v128h384v128h0Zm-320-128v-128h128v128Zm320-128h-128v-128h-384v-128h512v256h0Z" transform="translate(3421 2814)" fill="#040214"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="346" height="346" viewBox="0 0 346 346">
+  <g id="_1" data-name="1" transform="translate(-252 -389)">
+    <circle id="Ellipse_2" data-name="Ellipse 2" cx="173" cy="173" r="173" transform="translate(252 389)" fill="#040214"/>
+    <path id="Rectangle_36" data-name="Rectangle 36" d="M64,0H86.432a0,0,0,0,1,0,0V108.863a64,64,0,0,1-64,64H0a0,0,0,0,1,0,0V64A64,64,0,0,1,64,0Z" transform="translate(456.029 470.409) rotate(45)" fill="#fff"/>
+  </g>
 </svg>

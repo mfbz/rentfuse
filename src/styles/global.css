@@ -16,7 +16,7 @@ a {
 
 a:hover {
 	color: #14b9eb !important;
-	border-bottom: 3px solid #14b9eb;
+	border-bottom: 3px solid #eceff1;
 }
 
 a.g-link-no-border {
@@ -25,7 +25,7 @@ a.g-link-no-border {
 }
 
 a.g-link-no-border:hover {
-	color: #14b9eb !important;
+	color: #eceff1 !important;
 	border: 0;
 }
 
@@ -33,4 +33,16 @@ a.g-link-no-border:hover {
 
 .ant-table-thead > tr > th {
 	font-weight: bold !important;
+}
+
+.ant-table-tbody > tr:last-child {
+	border-radius: 0px 0px 16px 16px;
+}
+
+.ant-table-tbody > tr:last-child > td:first-child {
+	border-radius: 0px 0px 0px 16px;
+}
+
+.ant-table-tbody > tr:last-child > td:last-child {
+	border-radius: 0px 0px 16px 0px;
 }

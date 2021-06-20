@@ -1,22 +1,21 @@
-import { Layout } from 'antd';
+import { Layout, Space } from 'antd';
 import React from 'react';
+import { ApplicationLogo } from '../application-logo';
+import { ApplicationWalletButton } from './components/application-wallet-button';
 
 export const HEADER_HEIGHT = 80;
 
-export const ApplicationHeader = React.memo(function ApplicationHeader({
-	logo,
-	navBar,
-}: {
-	logo: React.ReactNode;
-	navBar: React.ReactNode;
-}) {
+export const ApplicationHeader = React.memo(function ApplicationHeader({}: {}) {
 	return (
 		<div>
 			<Layout.Header className={'a-header'}>
 				<div className={'a-header-wrapper'}>
 					<div className={'a-header-content'}>
-						{logo}
-						{navBar}
+						<ApplicationLogo />
+
+						<Space>
+							<ApplicationWalletButton />
+						</Space>
 					</div>
 				</div>
 			</Layout.Header>
@@ -26,12 +25,13 @@ export const ApplicationHeader = React.memo(function ApplicationHeader({
 					width: 100%;
 					height: ${HEADER_HEIGHT}px;
 					padding: 0px 48px 0px 48px;
-					border-radius: 0px 0px 48px 48px;
+					box-shadow: 0px 2px 8px #f0f1f2;
 					display: flex;
 					justify-content: center;
 					align-items: center;
 					position: fixed;
 					z-index: 10;
+					background: #ffffff;
 				}
 
 				.a-header-wrapper {

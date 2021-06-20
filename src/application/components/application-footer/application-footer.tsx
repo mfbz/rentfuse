@@ -2,7 +2,6 @@ import { Typography } from 'antd';
 import React from 'react';
 import { Layout } from 'antd';
 import Icon from '@ant-design/icons';
-import { LinkedinIcon } from '../../../common/icons/linkedin-icon';
 import { GithubIcon } from '../../../common/icons/github-icon';
 
 export const ApplicationFooter = React.memo(function ApplicationFooter({}: {}) {
@@ -12,23 +11,19 @@ export const ApplicationFooter = React.memo(function ApplicationFooter({}: {}) {
 				<div className={'a-footer-wrapper'}>
 					<div className={'a-footer-inner'}>
 						<div className={'a-footer-column'}>
-							<Typography.Paragraph style={{ marginBottom: 0 }}>Made in Italy with ❤️</Typography.Paragraph>
-							<Typography.Paragraph style={{ marginBottom: 0 }} strong={true}>
-								© Michael Fabozzi
+							<Typography.Paragraph style={{ marginBottom: 0, color: '#FFFFFF' }}>
+								Made in Italy with ❤️
+							</Typography.Paragraph>
+							<Typography.Paragraph style={{ marginBottom: 0, color: '#FFFFFF' }} strong={true}>
+								© rentfuse
 							</Typography.Paragraph>
 						</div>
 
 						<div className={'a-footer-column'}>
 							<div style={{ display: 'flex', flexDirection: 'row' }}>
-								<div style={{ marginRight: 16 }}>
-									<a href="https://www.linkedin.com/in/michael-fabozzi/" target="_blank" className={'g-link-no-border'}>
-										<Icon component={LinkedinIcon} className={'a-footer-icon'} style={{ color: '#0e76a8' }} />
-									</a>
-								</div>
-
 								<div>
-									<a href="https://github.com/mfbz" target="_blank" className={'g-link-no-border'}>
-										<Icon component={GithubIcon} className={'a-footer-icon'} style={{ color: '#333333' }} />
+									<a href="https://github.com/mfbz/rentfuse" target="_blank" className={'g-link-no-border'}>
+										<Icon component={GithubIcon} className={'a-footer-icon'} style={{ color: '#FFFFFF' }} />
 									</a>
 								</div>
 							</div>
@@ -44,7 +39,7 @@ export const ApplicationFooter = React.memo(function ApplicationFooter({}: {}) {
 					display: flex;
 					justify-content: center;
 					align-items: center;
-					background: #ededfd;
+					background: #040214;
 				}
 
 				div :global(a) {
@@ -62,8 +57,7 @@ export const ApplicationFooter = React.memo(function ApplicationFooter({}: {}) {
 				}
 
 				div :global(.a-footer-icon):hover {
-					color: #ffffff;
-					background: #00ffb9;
+					color: #eceff1;
 				}
 
 				.a-footer-wrapper {

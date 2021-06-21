@@ -23,6 +23,9 @@ namespace DummyNFT
 		private static StorageMap TokenToOwner => new StorageMap(Storage.CurrentContext, "TokenToOwner");
 		private static StorageMap AddressToTokenCount => new StorageMap(Storage.CurrentContext, "AddressToTokenCount");
 
+		[DisplayName("Transfer")]
+		public static event Action<UInt160, UInt160, BigInteger, ByteString> OnTransfer;
+
 		[DisplayName("symbol")]
 		public static string Symbol() => "DUMMY";
 
@@ -30,7 +33,7 @@ namespace DummyNFT
 		public static byte Decimals() => 0;
 
 		[DisplayName("totalSupply")]
-		public static BigInteger TotalSupply() => 100000;
+		public static BigInteger TotalSupply() => 10000;
 
 		[DisplayName("balanceOf")]
 		public static BigInteger BalanceOf(UInt160 address)
@@ -50,22 +53,23 @@ namespace DummyNFT
 		public static bool Transfer(UInt160 to, ByteString tokenId)
 		{
 			ValidateAddress(to);
-			// TODO
-			/*
-			StorageMap tokenMap = new(Storage.CurrentContext, Prefix_Token);
-            TokenState token = (TokenState)StdLib.Deserialize(tokenMap[tokenId]);
-            UInt160 from = token.Owner;
-            if (!Runtime.CheckWitness(from)) return false;
-            if (from != to)
-            {
-                token.Owner = to;
-                tokenMap[tokenId] = StdLib.Serialize(token);
-                UpdateBalance(from, tokenId, -1);
-                UpdateBalance(to, tokenId, +1);
-            }
-            PostTransfer(from, to, tokenId, data);
-            return true;
-			*/
+			ValidateToken((BigInteger)tokenId);
+
+			// Get the owner of the token and check that it's really it that is calling the contract
+			UInt160 from = (UInt160)TokenToOwner[tokenId];
+			if (!Runtime.CheckWitness(from)) return false;
+
+			// Do ownership update if transferred to other address
+			if (from != to)
+			{
+				// Assign the token to the new owner
+				TokenToOwner[tokenId] = to;
+				// Update token owners balances
+				UpdateBalance(from, tokenId, -1);
+				UpdateBalance(to, tokenId, +1);
+			}
+
+			PostTransfer(from, to, tokenId);
 			return true;
 		}
 
@@ -73,7 +77,9 @@ namespace DummyNFT
 		public static void Deploy(object data, bool update)
 		{
 			if (update) return;
+			// Initialize contract data
 			Storage.Put(Storage.CurrentContext, "OwnerAddress", (ByteString)Tx.Sender);
+			Storage.Put(Storage.CurrentContext, "TokenCount", 0);
 		}
 
 		public static void Update(ByteString nefFile, string manifest)
@@ -107,5 +113,30 @@ namespace DummyNFT
 				throw new Exception("The argument <address> is invalid");
 		}
 
+		private static void ValidateToken(BigInteger tokenId)
+		{
+			BigInteger tokenCount = TokenCount();
+			if (tokenId < 1 || tokenId > tokenCount) throw new Exception("Invalid token id");
+		}
+
+		private static void UpdateBalance(UInt160 address, ByteString tokenId, int increment)
+		{
+			BigInteger tokenCount = (BigInteger)AddressToTokenCount[address];
+
+			tokenCount += increment;
+			if (tokenCount < 0) throw new Exception("An address cannot have negative token count");
+
+			if (tokenCount.IsZero)
+				AddressToTokenCount.Delete(address);
+			else
+				AddressToTokenCount.Put(address, tokenCount);
+		}
+
+		private static void PostTransfer(UInt160 from, UInt160 to, ByteString tokenId)
+		{
+			OnTransfer(from, to, 1, tokenId);
+			if (to is not null && ContractManagement.GetContract(to) is not null)
+				Contract.Call(to, "onNEP11Payment", CallFlags.All, from, 1, tokenId);
+		}
 	}
 }

@@ -37,6 +37,41 @@
       }
     }
   ],
-  "wallets": [],
+  "wallets": [
+    {
+      "name": "alice",
+      "accounts": [
+        {
+          "private-key": "6c5889b9892fb1d0eb26bac940749a81e277ab98ccfbe486641c48fb6eb56a51",
+          "script-hash": "NMojetgaoRD74h9fRb3T8Yd5DEfCdxx7pD",
+          "label": null,
+          "is-default": true,
+          "contract": {
+            "script": "0c21038d3009d6cd63f365cd3f859e0a1ca89e8e66ab7d46943ff340aa53190784dc684156e7b327",
+            "parameters": [
+              "Signature"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "bob",
+      "accounts": [
+        {
+          "private-key": "77c6780c383ecfafb8196d771f0dd4763d45672e9dba6aa43d349b9109e92562",
+          "script-hash": "NWEcD5bRPmF1vywSWDYpf7XmDC8ArYyNLb",
+          "label": null,
+          "is-default": true,
+          "contract": {
+            "script": "0c2102448efaa9dca5152183942663e6912501a80796edc274babdac58569c8a9c8e684156e7b327",
+            "parameters": [
+              "Signature"
+            ]
+          }
+        }
+      ]
+    }
+  ],
   "settings": {}
 }

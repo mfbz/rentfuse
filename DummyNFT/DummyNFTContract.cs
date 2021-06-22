@@ -21,6 +21,7 @@ namespace DummyNFT
 		private static ByteString OwnerAddress() => (ByteString)Storage.Get(Storage.CurrentContext, "OwnerAddress");
 		private static BigInteger TokenCount() => (BigInteger)Storage.Get(Storage.CurrentContext, "TokenCount");
 		private static StorageMap TokenToOwner => new StorageMap(Storage.CurrentContext, "TokenToOwner");
+		private static StorageMap TokenToProperties => new StorageMap(Storage.CurrentContext, "TokenToProperties");
 		private static StorageMap AddressToTokenCount => new StorageMap(Storage.CurrentContext, "AddressToTokenCount");
 
 		[DisplayName("Transfer")]
@@ -46,7 +47,7 @@ namespace DummyNFT
 		public static Iterator TokensOf(UInt160 address)
 		{
 			ValidateAddress(address);
-			return TokenToOwner.Find(address, FindOptions.KeysOnly | FindOptions.RemovePrefix);
+			return TokenToOwner.Find(address, FindOptions.KeysOnly);
 		}
 
 		[DisplayName("transfer")]
@@ -73,6 +74,26 @@ namespace DummyNFT
 			return true;
 		}
 
+		[DisplayName("ownerOf")]
+		public static UInt160 OwnerOf(ByteString tokenId)
+		{
+			ValidateToken((BigInteger)tokenId);
+			return (UInt160)TokenToOwner[tokenId];
+		}
+
+		[DisplayName("tokens")]
+		public static Iterator tokens()
+		{
+			return TokenToOwner.Find(FindOptions.KeysOnly);
+		}
+
+		[DisplayName("properties")]
+		public static string Properties(ByteString tokenId)
+		{
+			ValidateToken((BigInteger)tokenId);
+			return TokenToProperties[tokenId];
+		}
+
 		[DisplayName("_deploy")]
 		public static void Deploy(object data, bool update)
 		{
@@ -80,6 +101,26 @@ namespace DummyNFT
 			// Initialize contract data
 			Storage.Put(Storage.CurrentContext, "OwnerAddress", (ByteString)Tx.Sender);
 			Storage.Put(Storage.CurrentContext, "TokenCount", 0);
+		}
+
+		public static void Mint(ByteString tokenId, string properties)
+		{
+			BigInteger tokenCount = TokenCount();
+			tokenCount += 1;
+
+			// If reached maximum supply avoid minting and throw exception
+			if (tokenCount > TotalSupply()) throw new Exception("All tokens already minted");
+
+			// Update global token count
+			Storage.Put(Storage.CurrentContext, "TokenCount", tokenCount);
+			// Assign token to owner
+			TokenToOwner.Put((ByteString)tokenCount, (ByteString)Tx.Sender);
+			// Add input token properties
+			TokenToProperties.Put((ByteString)tokenCount, properties);
+
+			// Update address balance and post token transfer
+			UpdateBalance((UInt160)Tx.Sender, tokenId, +1);
+			PostTransfer(null, (UInt160)Tx.Sender, tokenId);
 		}
 
 		public static void Update(ByteString nefFile, string manifest)
@@ -121,15 +162,15 @@ namespace DummyNFT
 
 		private static void UpdateBalance(UInt160 address, ByteString tokenId, int increment)
 		{
-			BigInteger tokenCount = (BigInteger)AddressToTokenCount[address];
+			BigInteger addressTokenCount = (BigInteger)AddressToTokenCount[address];
 
-			tokenCount += increment;
-			if (tokenCount < 0) throw new Exception("An address cannot have negative token count");
+			addressTokenCount += increment;
+			if (addressTokenCount < 0) throw new Exception("An address cannot have negative token count");
 
-			if (tokenCount.IsZero)
+			if (addressTokenCount.IsZero)
 				AddressToTokenCount.Delete(address);
 			else
-				AddressToTokenCount.Put(address, tokenCount);
+				AddressToTokenCount.Put(address, addressTokenCount);
 		}
 
 		private static void PostTransfer(UInt160 from, UInt160 to, ByteString tokenId)

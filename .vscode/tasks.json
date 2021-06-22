@@ -1,75 +1,75 @@
 {
   "version": "2.0.0",
   "tasks": [
-    {
-      "options": {
-        "cwd": "${workspaceFolder}/RentFuse"
-      },
-      "label": "RentFuse: restore",
-      "command": "dotnet",
-      "type": "shell",
-      "args": [
-        "restore"
-      ],
-      "group": "build",
-      "presentation": {
-        "reveal": "silent"
-      },
-      "problemMatcher": []
-    },
-    {
-      "options": {
-        "cwd": "${workspaceFolder}/RentFuse"
-      },
-      "label": "RentFuse: build",
-      "command": "dotnet",
-      "type": "shell",
-      "args": [
-        "build",
-        "/property:GenerateFullPaths=true",
-        "/consoleloggerparameters:NoSummary"
-      ],
-      "group": "build",
-      "presentation": {
-        "reveal": "silent"
-      },
-      "problemMatcher": "$msCompile",
-      "dependsOn": "RentFuse: restore"
-    },
-    {
-      "options": {
-        "cwd": "${workspaceFolder}/DummyNFT"
-      },
-      "label": "DummyNFT: restore",
-      "command": "dotnet",
-      "type": "shell",
-      "args": [
-        "restore"
-      ],
-      "group": "build",
-      "presentation": {
-        "reveal": "silent"
-      },
-      "problemMatcher": []
-    },
-    {
-      "options": {
-        "cwd": "${workspaceFolder}/DummyNFT"
-      },
-      "label": "DummyNFT: build",
-      "command": "dotnet",
-      "type": "shell",
-      "args": [
-        "build",
-        "/property:GenerateFullPaths=true",
-        "/consoleloggerparameters:NoSummary"
-      ],
-      "group": "build",
-      "presentation": {
-        "reveal": "silent"
-      },
-      "problemMatcher": "$msCompile",
-      "dependsOn": "DummyNFT: restore"
-    }
-  ]
+		{
+			"options": {
+				"cwd": "${workspaceFolder}/contracts/RentFuse"
+			},
+			"label": "RentFuse: restore",
+			"command": "dotnet",
+			"type": "shell",
+			"args": [
+				"restore"
+			],
+			"group": "build",
+			"presentation": {
+				"reveal": "silent"
+			},
+			"problemMatcher": []
+		},
+		{
+			"options": {
+				"cwd": "${workspaceFolder}/contracts/RentFuse"
+			},
+			"label": "RentFuse: build",
+			"command": "dotnet",
+			"type": "shell",
+			"args": [
+				"build",
+				"/property:GenerateFullPaths=true",
+				"/consoleloggerparameters:NoSummary"
+			],
+			"group": "build",
+			"presentation": {
+				"reveal": "silent"
+			},
+			"problemMatcher": "$msCompile",
+			"dependsOn": "RentFuse: restore"
+		},
+		{
+			"options": {
+				"cwd": "${workspaceFolder}/contracts/DummyNFT"
+			},
+			"label": "DummyNFT: restore",
+			"command": "dotnet",
+			"type": "shell",
+			"args": [
+				"restore"
+			],
+			"group": "build",
+			"presentation": {
+				"reveal": "silent"
+			},
+			"problemMatcher": []
+		},
+		{
+			"options": {
+				"cwd": "${workspaceFolder}/contracts/DummyNFT"
+			},
+			"label": "DummyNFT: build",
+			"command": "dotnet",
+			"type": "shell",
+			"args": [
+				"build",
+				"/property:GenerateFullPaths=true",
+				"/consoleloggerparameters:NoSummary"
+			],
+			"group": "build",
+			"presentation": {
+				"reveal": "silent"
+			},
+			"problemMatcher": "$msCompile",
+			"dependsOn": "DummyNFT: restore"
+		}
+	]
 }

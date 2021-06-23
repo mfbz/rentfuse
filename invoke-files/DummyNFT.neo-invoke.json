@@ -1,0 +1,16 @@
+[
+	{
+		"contract": "DummyNFTContract",
+		"operation": "mint",
+		"args": [
+			"{\"name\":\"Slime\",\"description\":\"A slime\",\"image\":\"https://static.wikia.nocookie.net/dragonquest/images/6/60/Slime_Artwork.png/revision/latest/scale-to-width-down/1000?cb=20201021141416\"}"
+		]
+  },
+  {
+    "contract": "DummyNFTContract",
+    "operation": "properties",
+    "args": [
+      1
+    ]
+  }
+]

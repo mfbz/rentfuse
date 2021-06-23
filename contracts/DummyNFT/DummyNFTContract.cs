@@ -103,7 +103,7 @@ namespace DummyNFT
 			Storage.Put(Storage.CurrentContext, "TokenCount", 0);
 		}
 
-		public static void Mint(ByteString tokenId, string properties)
+		public static void Mint(string properties)
 		{
 			BigInteger tokenCount = TokenCount();
 			tokenCount += 1;
@@ -119,8 +119,8 @@ namespace DummyNFT
 			TokenToProperties.Put((ByteString)tokenCount, properties);
 
 			// Update address balance and post token transfer
-			UpdateBalance((UInt160)Tx.Sender, tokenId, +1);
-			PostTransfer(null, (UInt160)Tx.Sender, tokenId);
+			UpdateBalance((UInt160)Tx.Sender, (ByteString)tokenCount, +1);
+			PostTransfer(null, (UInt160)Tx.Sender, (ByteString)tokenCount);
 		}
 
 		public static void Update(ByteString nefFile, string manifest)

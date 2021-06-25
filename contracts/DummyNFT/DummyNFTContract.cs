@@ -24,6 +24,8 @@ namespace DummyNFT
 		private static StorageMap TokenToProperties => new StorageMap(Storage.CurrentContext, "TokenToProperties");
 		private static StorageMap AddressToTokenCount => new StorageMap(Storage.CurrentContext, "AddressToTokenCount");
 
+		private static Transaction Tx => (Transaction)Runtime.ScriptContainer;
+
 		[DisplayName("Transfer")]
 		public static event Action<UInt160, UInt160, BigInteger, ByteString> OnTransfer;
 
@@ -135,17 +137,10 @@ namespace DummyNFT
 			ContractManagement.Destroy();
 		}
 
-		private static Transaction Tx => (Transaction)Runtime.ScriptContainer;
-
-		private static bool IsOwner()
-		{
-			ByteString owner = OwnerAddress();
-			return Runtime.CheckWitness((UInt160)owner);
-		}
-
 		private static void ValidateOwner()
 		{
-			if (!IsOwner()) throw new Exception("No authorization");
+			ByteString owner = OwnerAddress();
+			if (!Runtime.CheckWitness((UInt160)owner)) throw new Exception("No authorization");
 		}
 
 		private static void ValidateAddress(UInt160 address)

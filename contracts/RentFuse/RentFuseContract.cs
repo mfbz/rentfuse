@@ -34,9 +34,6 @@ namespace RentFuse
 			// Check that the owner of the nft is the person that is calling the contract
 			Runtime.CheckWitness(owner);
 
-			// Throw an exception if transaction sender is different from the owner
-			if (owner != (UInt160)Tx.Sender) throw new Exception("The owner is different");
-
 			// Create a token id that is token count plus 1
 			BigInteger tokenCount = TokenCount();
 			tokenCount += 1;

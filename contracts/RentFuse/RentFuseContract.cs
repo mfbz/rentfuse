@@ -89,6 +89,11 @@ namespace RentFuse
 			OnTokenCreated((ByteString)tokenCount, owner);
 		}
 
+		public static void Withdraw()
+		{
+			// TODO
+		}
+
 		[DisplayName("_deploy")]
 		public static void Deploy(object data, bool update)
 		{
@@ -123,8 +128,10 @@ namespace RentFuse
 
 		private static void ValidateToken(ByteString tokenId)
 		{
-			BigInteger tokenCount = TokenCount();
-			if ((BigInteger)tokenId < 1 || (BigInteger)tokenId > tokenCount) throw new Exception("Invalid token id");
+			// Get rent data associated to token id passed
+			var rentData = TokenToRent[tokenId];
+			// If not found it means that the token id is invalid
+			if (rentData == null) throw new Exception("Invalid token id");
 		}
 		private static void RentToken(ByteString tokenId, UInt160 tenant, BigInteger amount)
 		{

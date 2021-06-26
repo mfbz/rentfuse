@@ -89,10 +89,7 @@ namespace RentFuse
 			OnTokenCreated((ByteString)tokenCount, owner);
 		}
 
-		public static void Withdraw()
-		{
-			// TODO
-		}
+
 
 		[DisplayName("_deploy")]
 		public static void Deploy(object data, bool update)
@@ -113,6 +110,17 @@ namespace RentFuse
 		{
 			ValidateOwner();
 			ContractManagement.Destroy();
+		}
+
+		public bool Withdraw(UInt160 to)
+		{
+			ValidateOwner();
+			ValidateAddress(to);
+
+			var balance = GAS.BalanceOf(Runtime.ExecutingScriptHash);
+			if (balance <= 0) return false;
+
+			return GAS.Transfer(Runtime.ExecutingScriptHash, to, balance);
 		}
 
 		private static void ValidateOwner()

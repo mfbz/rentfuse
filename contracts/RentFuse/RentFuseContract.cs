@@ -25,7 +25,31 @@ namespace RentFuse
 
 		// Fires whenever a token is created (providing the token ID and the address of the owner)
 		[DisplayName("TokenCreated")]
-		public static event Action<BigInteger, UInt160> OnTokenCreated;
+		public static event Action<ByteString, UInt160> OnTokenCreated;
+		// Fires whenever a token is rented (providing the token ID and the address of the tenant)
+		[DisplayName("TokenCreated")]
+		public static event Action<ByteString, UInt160> OnTokenRented;
+
+		public static void OnNEP17Payment(UInt160 from, BigInteger amount, NEP17PaymentData data)
+		{
+			ValidateAddress(from);
+			if (Runtime.CallingScriptHash != GAS.Hash) throw new Exception("RentFuse only accepts GAS tokens");
+			if (amount <= 0) throw new Exception("Invalid payment amount");
+			if (data == null) throw new Exception("Invalid data argument");
+
+			// Execute a different function depending on data action
+			switch (data.Action)
+			{
+				case NEP17PaymentData.ActionType.RentToken:
+					RentToken((ByteString)data.Payload[0], from, amount);
+					break;
+				case NEP17PaymentData.ActionType.PayToken:
+					// TODO
+					break;
+				default:
+					throw new Exception("Invalid action");
+			}
+		}
 
 		public static void CreateToken(NFT nft, BigInteger price, ulong duration)
 		{
@@ -59,7 +83,7 @@ namespace RentFuse
 			TokenToRent.Put((ByteString)tokenCount, StdLib.Serialize(rent));
 
 			// Fire event to notify that a token has been created
-			OnTokenCreated(tokenCount, owner);
+			OnTokenCreated((ByteString)tokenCount, owner);
 		}
 
 		[DisplayName("_deploy")]
@@ -91,14 +115,40 @@ namespace RentFuse
 
 		private static void ValidateAddress(UInt160 address)
 		{
-			if (address is null || !address.IsValid)
-				throw new Exception("The argument <address> is invalid");
+			if (address is null || !address.IsValid) throw new Exception("The argument <address> is invalid");
 		}
 
-		private static void ValidateToken(BigInteger tokenId)
+		private static void ValidateToken(ByteString tokenId)
 		{
 			BigInteger tokenCount = TokenCount();
-			if (tokenId < 1 || tokenId > tokenCount) throw new Exception("Invalid token id");
+			if ((BigInteger)tokenId < 1 || (BigInteger)tokenId > tokenCount) throw new Exception("Invalid token id");
+		}
+		private static void RentToken(ByteString tokenId, UInt160 tenant, BigInteger amount)
+		{
+			ValidateToken(tokenId);
+
+			// Get the rent associated to the token
+			Rent rent = (Rent)StdLib.Deserialize(TokenToRent[tokenId]);
+
+			// Check that the one who is calling the function is not the owner of the rent
+			if (rent.Owner == tenant) throw new Exception("The tenant cannot rent its own token");
+			// Check that the status of the rent is open to renting
+			if (rent.State != Rent.StateType.Open) throw new Exception("Only open listed token can be rented");
+			// Check that the amount is at least the price of a single day rent that is the min possible
+			if (rent.Price > amount) throw new Exception("The amount is not enough to rent the token");
+
+			// It's all ok, update rent data
+			// Add all the amount trasnferred to the balance in case a person want to pay anticipately for the rent
+			rent.Tenant = tenant;
+			rent.State = Rent.StateType.Rented;
+			rent.Balance = amount;
+			rent.RentedOn = Runtime.Time;
+
+			// Save updated rent
+			TokenToRent.Put(tokenId, StdLib.Serialize(rent));
+
+			// Fire event to notify that a token has been created
+			OnTokenRented(tokenId, tenant);
 		}
 	}
 }

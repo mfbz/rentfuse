@@ -21,6 +21,7 @@ namespace RentFuse.Models
 		public ulong Duration;
 		public ulong CreatedOn;
 		public ulong RentedOn;
+		public ulong WithdrawOn;
 		public ulong ClosedOn;
 	}
 }

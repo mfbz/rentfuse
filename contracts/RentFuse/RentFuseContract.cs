@@ -17,7 +17,6 @@ namespace RentFuse
 	[ManifestExtra("Version", "1.0.0")]
 	public class RentFuseContract : SmartContract
 	{
-
 		private const ulong MIN_RENT_DURATION = 1000 * 60 * 60 * 24; // 1 day in ms
 
 		private static ByteString OwnerAddress() => (ByteString)Storage.Get(Storage.CurrentContext, "OwnerAddress");
@@ -80,6 +79,7 @@ namespace RentFuse
 				Duration = duration,
 				CreatedOn = Runtime.Time,
 				RentedOn = 0,
+				WithdrawOn = 0,
 				ClosedOn = 0
 			};
 
@@ -92,7 +92,21 @@ namespace RentFuse
 			OnTokenCreated((ByteString)tokenCount, owner);
 		}
 
+		public bool WithdrawRent(UInt160 to)
+		{
+			/*
+			ValidateOwner();
+			ValidateAddress(to);
 
+			var balance = GAS.BalanceOf(Runtime.ExecutingScriptHash);
+			if (balance <= 0) return false;
+
+			return GAS.Transfer(Runtime.ExecutingScriptHash, to, balance);
+			*/
+
+			// TODO
+			return true;
+		}
 
 		[DisplayName("_deploy")]
 		public static void Deploy(object data, bool update)

@@ -27,8 +27,11 @@ namespace RentFuse
 		[DisplayName("TokenCreated")]
 		public static event Action<ByteString, UInt160> OnTokenCreated;
 		// Fires whenever a token is rented (providing the token ID and the address of the tenant)
-		[DisplayName("TokenCreated")]
+		[DisplayName("TokenRented")]
 		public static event Action<ByteString, UInt160> OnTokenRented;
+		// Fires whenever a token rent is paid (providing the token ID and the address of the tenant)
+		[DisplayName("TokenPaid")]
+		public static event Action<ByteString, UInt160> OnTokenPaid;
 
 		public static void OnNEP17Payment(UInt160 from, BigInteger amount, NEP17PaymentData data)
 		{
@@ -44,7 +47,7 @@ namespace RentFuse
 					RentToken((ByteString)data.Payload[0], from, amount);
 					break;
 				case NEP17PaymentData.ActionType.PayToken:
-					// TODO
+					PayToken((ByteString)data.Payload[0], from, amount);
 					break;
 				default:
 					throw new Exception("Invalid action");
@@ -135,7 +138,7 @@ namespace RentFuse
 			// Check that the status of the rent is open to renting
 			if (rent.State != Rent.StateType.Open) throw new Exception("Only open listed token can be rented");
 			// Check that the amount is at least the price of a single day rent that is the min possible
-			if (rent.Price > amount) throw new Exception("The amount is not enough to rent the token");
+			if (rent.Price > amount) throw new Exception("The amount is not enough to pay for the rent");
 
 			// It's all ok, update rent data
 			// Add all the amount trasnferred to the balance in case a person want to pay anticipately for the rent
@@ -149,6 +152,28 @@ namespace RentFuse
 
 			// Fire event to notify that a token has been created
 			OnTokenRented(tokenId, tenant);
+		}
+
+		private static void PayToken(ByteString tokenId, UInt160 tenant, BigInteger amount)
+		{
+			ValidateToken(tokenId);
+
+			// Get the rent associated to the token
+			Rent rent = (Rent)StdLib.Deserialize(TokenToRent[tokenId]);
+
+			// Check that the status of the rent is open to renting
+			if (rent.State != Rent.StateType.Rented) throw new Exception("Only rented token can be paid");
+			// Check that the amount is at least the price of a single day rent that is the min possible
+			if (rent.Price > amount) throw new Exception("The amount is not enough to pay for the rent");
+
+			// It's all ok, update rent data
+			rent.Balance = rent.Balance + amount;
+
+			// Save updated rent
+			TokenToRent.Put(tokenId, StdLib.Serialize(rent));
+
+			// Fire event to notify that a token has been created
+			OnTokenPaid(tokenId, tenant);
 		}
 	}
 }

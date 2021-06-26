@@ -30,7 +30,7 @@ namespace RentFuse
 		public static void CreateToken(NFT nft, BigInteger price, ulong duration)
 		{
 			// Call nft contract to get the owner of the nft (Only the owner of an nft can lend a token)
-			UInt160 owner = (UInt160)Contract.Call(nft.ContractAddress, "ownerOf", CallFlags.ReadOnly, new object[] { nft.TokenId });
+			UInt160 owner = (UInt160)Contract.Call(nft.TokenScriptHash, "ownerOf", CallFlags.ReadOnly, new object[] { nft.TokenId });
 			// Check that the owner of the nft is the person that is calling the contract
 			if (!owner.Equals((UInt160)Tx.Sender) || !Runtime.CheckWitness(owner)) throw new Exception("Only the owner can lend a NFT");
 

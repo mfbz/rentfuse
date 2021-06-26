@@ -75,11 +75,11 @@ namespace RentFuse
 				NFT = nft,
 				Price = price,
 				Balance = 0,
+				Amount = 0,
 				State = Rent.StateType.Open,
 				Duration = duration,
 				CreatedOn = Runtime.Time,
 				RentedOn = 0,
-				WithdrawOn = 0,
 				ClosedOn = 0
 			};
 
@@ -92,20 +92,39 @@ namespace RentFuse
 			OnTokenCreated((ByteString)tokenCount, owner);
 		}
 
-		public bool WithdrawRent(UInt160 to)
+		public bool WithdrawRent(ByteString tokenId)
 		{
-			/*
-			ValidateOwner();
-			ValidateAddress(to);
+			ValidateToken(tokenId);
 
-			var balance = GAS.BalanceOf(Runtime.ExecutingScriptHash);
-			if (balance <= 0) return false;
+			// Get the rent associated with the token
+			Rent rent = (Rent)StdLib.Deserialize(TokenToRent[tokenId]);
 
-			return GAS.Transfer(Runtime.ExecutingScriptHash, to, balance);
-			*/
+			// Check that the address calling this function is the owner of the rent
+			if (!rent.Owner.Equals((UInt160)Tx.Sender) || !Runtime.CheckWitness(rent.Owner)) throw new Exception("Only the owner can withdraw token rent");
+			// Check that the rent is not open, otherwise i cannot withdraw anything
+			if (rent.State == Rent.StateType.Open) throw new Exception("You cannot withdraw from an open token rent");
 
-			// TODO
-			return true;
+			// Get the amount the user can withdraw from rent token
+			BigInteger withdrawableAmount = rent.GetWithdrawableAmount();
+			// Transfer the amount to rent owner and update rent balance to prevent further withdraw
+			if (GAS.Transfer(Runtime.ExecutingScriptHash, rent.Owner, withdrawableAmount))
+			{
+				// Update balance decreasing it by withdrawn amount
+				rent.Balance = rent.Balance - withdrawableAmount;
+				// Check if the rent is finished and if so set it as closed
+				if (rent.IsCompleted())
+				{
+					rent.State = Rent.StateType.Closed;
+					rent.ClosedOn = Runtime.Time;
+				}
+
+				// Save updated rent
+				TokenToRent.Put(tokenId, StdLib.Serialize(rent));
+				return true;
+			}
+
+			// As default return that the withdraw doesn't went well
+			return false;
 		}
 
 		[DisplayName("_deploy")]
@@ -158,6 +177,8 @@ namespace RentFuse
 			// If not found it means that the token id is invalid
 			if (rentData == null) throw new Exception("Invalid token id");
 		}
+
+		// I can always pay at least for one day
 		private static void RentToken(ByteString tokenId, UInt160 tenant, BigInteger amount)
 		{
 			ValidateToken(tokenId);
@@ -177,6 +198,7 @@ namespace RentFuse
 			rent.Tenant = tenant;
 			rent.State = Rent.StateType.Rented;
 			rent.Balance = amount;
+			rent.Amount = amount;
 			rent.RentedOn = Runtime.Time;
 
 			// Save updated rent
@@ -186,6 +208,7 @@ namespace RentFuse
 			OnTokenRented(tokenId, tenant);
 		}
 
+		// I can only pay at least for 1 day
 		private static void PayToken(ByteString tokenId, UInt160 tenant, BigInteger amount)
 		{
 			ValidateToken(tokenId);
@@ -200,6 +223,7 @@ namespace RentFuse
 
 			// It's all ok, update rent data
 			rent.Balance = rent.Balance + amount;
+			rent.Amount = rent.Amount + amount;
 
 			// Save updated rent
 			TokenToRent.Put(tokenId, StdLib.Serialize(rent));

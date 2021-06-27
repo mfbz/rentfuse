@@ -223,7 +223,11 @@ namespace RentFuse
 			return false;
 		}
 
-		// 
+		public static Rent GetRent(ByteString tokenId)
+		{
+			ValidateToken(tokenId);
+			return (Rent)StdLib.Deserialize(TokenToRent[tokenId]);
+		}
 
 		public static List<Rent> GetRentList()
 		{

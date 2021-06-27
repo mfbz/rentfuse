@@ -1,6 +1,7 @@
 using System;
 using System.Numerics;
 using Neo;
+using Neo.SmartContract.Framework;
 using Neo.SmartContract.Framework.Services;
 
 namespace RentFuse.Models
@@ -14,6 +15,7 @@ namespace RentFuse.Models
 			Closed
 		}
 
+		public ByteString TokenId;
 		public UInt160 Owner;
 		public UInt160 Tenant;
 		public NFT NFT;

@@ -74,6 +74,7 @@ namespace RentFuse
 			// Create rent object and fill it with properties
 			Rent rent = new()
 			{
+				TokenId = (ByteString)tokenCount,
 				Owner = owner,
 				Tenant = null,
 				NFT = nft,
@@ -178,6 +179,33 @@ namespace RentFuse
 			TokenToRent.Delete(tokenId);
 			// Fire token deleted event
 			OnTokenDeleted(tokenId, rent.Owner);
+		}
+
+		// TODO
+		// SDK Layer: Check if an nft is in rented state
+		public bool IsRented(NFT nft)
+		{
+
+			return false;
+		}
+
+		// Return a map containing all tokens ids with associated rent
+		public static Map<ByteString, Rent> GetTokenToRentMap()
+		{
+			// Create a map to be returned
+			Map<ByteString, Rent> map = new();
+
+			// Create an iterator on all token to rent deserializing them and removing key prefix
+			Iterator iterator = TokenToRent.Find(FindOptions.DeserializeValues | FindOptions.RemovePrefix);
+			// Iterate on the iterator to get a map of the token and rents
+			while (iterator.Next())
+			{
+				var kvp = (object[])iterator.Value;
+				var key = (ByteString)kvp[0];
+				map[key] = (Rent)kvp[1];
+			}
+
+			return map;
 		}
 
 		[DisplayName("_deploy")]

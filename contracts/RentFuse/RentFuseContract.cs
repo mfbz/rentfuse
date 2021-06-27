@@ -37,6 +37,9 @@ namespace RentFuse
 		// Fires whenever a token rent is closed (providing the token ID and the address of the owner)
 		[DisplayName("TokenClosed")]
 		public static event Action<ByteString, UInt160> OnTokenClosed;
+		// Fires whenever a token rent is deleted (providing the token ID and the address of the owner)
+		[DisplayName("TokenDeleted")]
+		public static event Action<ByteString, UInt160> OnTokenDeleted;
 
 		public static void OnNEP17Payment(UInt160 from, BigInteger amount, NEP17PaymentData data)
 		{
@@ -175,6 +178,8 @@ namespace RentFuse
 
 			// Delete token rent
 			TokenToRent.Delete(tokenId);
+			// Fire token deleted event
+			OnTokenDeleted(tokenId, rent.Owner);
 		}
 
 		[DisplayName("_deploy")]

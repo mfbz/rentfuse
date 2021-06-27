@@ -17,8 +17,6 @@ namespace RentFuse
 	[ManifestExtra("Version", "1.0.0")]
 	public class RentFuseContract : SmartContract
 	{
-		private const ulong MIN_RENT_DURATION = 1000 * 60 * 60 * 24; // 1 day in ms
-
 		private static ByteString OwnerAddress() => (ByteString)Storage.Get(Storage.CurrentContext, "OwnerAddress");
 		private static BigInteger TokenCount() => (BigInteger)Storage.Get(Storage.CurrentContext, "TokenCount");
 		private static StorageMap TokenToRent => new StorageMap(Storage.CurrentContext, "TokenToRent");

@@ -70,13 +70,12 @@ namespace RentFuse
 
 		public static void CreateToken(NFT nft, BigInteger price, ulong duration)
 		{
-			// Call nft contract to get the owner of the nft (Only the owner of an nft can lend a token)
+			// Call nft contract to get the owner of the nft and check if it exists (Only the owner of an nft can lend a token)
 			UInt160 owner = (UInt160)Contract.Call(nft.TokenScriptHash, "ownerOf", CallFlags.ReadOnly, new object[] { nft.TokenId });
 			// Check that the owner of the nft is the person that is calling the contract
 			if (!owner.Equals((UInt160)Tx.Sender) || !Runtime.CheckWitness(owner)) throw new Exception("Only the owner can lend a NFT");
-
 			// Check that the NFT has not been rented yet, a nft can only have 1 open rent
-			if (NFTToToken[nft.TokenScriptHash + nft.TokenId] != null) throw new Exception("A NFT can be assigned to only 1 token per time");
+			if (IsRented(nft)) throw new Exception("Cannot create a token for a rented NFT");
 
 			// Create a token id that is token count plus 1
 			BigInteger tokenCount = TokenCount();
@@ -115,7 +114,7 @@ namespace RentFuse
 		}
 
 		// Withdraw available balance from token rent and close it if it's terminated, it's like the terminating function
-		public bool WithdrawRent(ByteString tokenId)
+		public static bool WithdrawRent(ByteString tokenId)
 		{
 			ValidateToken(tokenId);
 
@@ -146,12 +145,8 @@ namespace RentFuse
 
 				// Do final operations if the rent has been closed with this withdraw
 				if (rent.State == Rent.StateType.Closed)
-				{
-					// Clear nft assignment to token so that i can rent it again
-					NFTToToken.Delete(rent.NFT.TokenScriptHash + rent.NFT.TokenId);
 					// Fire token closed event if it has been closed
 					OnTokenClosed(tokenId, rent.Owner);
-				}
 
 				// Return true, everything went well
 				return true;
@@ -162,7 +157,7 @@ namespace RentFuse
 		}
 
 		// Revoke the rent if the tenant doesn't pay and the rent is expired
-		public void RevokeRent(ByteString tokenId)
+		public static void RevokeRent(ByteString tokenId)
 		{
 			ValidateToken(tokenId);
 
@@ -182,15 +177,13 @@ namespace RentFuse
 
 			// Save updated rent
 			TokenToRent.Put(tokenId, StdLib.Serialize(rent));
-			// Clear nft assignment to token so that i can rent it again
-			NFTToToken.Delete(rent.NFT.TokenScriptHash + rent.NFT.TokenId);
 
 			// Fire token closed event
 			OnTokenClosed(tokenId, rent.Owner);
 		}
 
 		// Delete the rent if it's open and the owner don't want it anymore
-		public void DeleteRent(ByteString tokenId)
+		public static void DeleteRent(ByteString tokenId)
 		{
 			ValidateToken(tokenId);
 
@@ -207,17 +200,23 @@ namespace RentFuse
 			// Delete token to account
 			OwnerToToken.Delete(rent.Owner + rent.TokenId);
 
-			// Clear nft assignment to token so that i can rent it again
-			NFTToToken.Delete(rent.NFT.TokenScriptHash + rent.NFT.TokenId);
-
 			// Fire token deleted event
 			OnTokenDeleted(tokenId, rent.Owner);
 		}
 
-		// TODO
-		// SDK Layer: Check if an nft is in rented state
-		public bool IsRented(NFT nft)
+		// Check if an nft is in rented state
+		public static bool IsRented(NFT nft)
 		{
+			// Get the token id associated to input nft if any
+			ByteString tokenId = NFTToToken[nft.TokenScriptHash + nft.TokenId];
+			if (tokenId != null)
+			{
+				// Get the rent associated with the token
+				Rent rent = (Rent)StdLib.Deserialize(TokenToRent[tokenId]);
+
+				// It's considered rented if the associated token has rented status otherwise no
+				return rent.State == Rent.StateType.Rented;
+			}
 
 			return false;
 		}
@@ -264,7 +263,7 @@ namespace RentFuse
 			ContractManagement.Destroy();
 		}
 
-		public bool Withdraw(UInt160 to)
+		public static bool Withdraw(UInt160 to)
 		{
 			ValidateOwner();
 			ValidateAddress(to);

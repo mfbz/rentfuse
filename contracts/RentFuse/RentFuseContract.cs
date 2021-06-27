@@ -223,13 +223,17 @@ namespace RentFuse
 			return false;
 		}
 
-		public static Rent GetRent(ByteString tokenId)
+		public static string GetRent(ByteString tokenId)
 		{
 			ValidateToken(tokenId);
-			return (Rent)StdLib.Deserialize(TokenToRent[tokenId]);
+			Rent rent = (Rent)StdLib.Deserialize(TokenToRent[tokenId]);
+
+			// Return a JSON representation of the object in array like form
+			var result = new object[] { rent };
+			return StdLib.JsonSerialize(result);
 		}
 
-		public static List<Rent> GetRentList()
+		public static string GetRentList()
 		{
 			// Create the rent list that will be returned
 			List<Rent> rentList = new List<Rent>();
@@ -242,12 +246,61 @@ namespace RentFuse
 				var kvp = (object[])iterator.Value;
 
 				var key = (ByteString)kvp[0];
-				var value = (Rent)kvp[1];
+				var rent = (Rent)kvp[1];
 
-				rentList.Add(value);
+				rentList.Add(rent);
 			}
 
-			return rentList;
+			var result = new object[] { rentList };
+			return StdLib.JsonSerialize(result);
+		}
+
+		public static string GetRentListAsOwner(UInt160 owner)
+		{
+			ValidateAddress(owner);
+
+			// Create the rent list that will be returned
+			List<Rent> rentList = new List<Rent>();
+
+			// Create an iterator on all token to rent deserializing them and removing key prefix
+			Iterator iterator = OwnerToToken.Find(owner, FindOptions.RemovePrefix);
+			// Iterate on the iterator to get a map of the token and rents
+			while (iterator.Next())
+			{
+				var kvp = (object[])iterator.Value;
+
+				var key = (ByteString)kvp[0];
+				var tokenId = (ByteString)kvp[1];
+
+				rentList.Add((Rent)StdLib.Deserialize(TokenToRent[tokenId]));
+			}
+
+			var result = new object[] { rentList };
+			return StdLib.JsonSerialize(result);
+		}
+
+		public static string GetRentListAsTenant(UInt160 tenant)
+		{
+			ValidateAddress(tenant);
+
+			// Create the rent list that will be returned
+			List<Rent> rentList = new List<Rent>();
+
+			// Create an iterator on all token to rent deserializing them and removing key prefix
+			Iterator iterator = TenantToToken.Find(tenant, FindOptions.RemovePrefix);
+			// Iterate on the iterator to get a map of the token and rents
+			while (iterator.Next())
+			{
+				var kvp = (object[])iterator.Value;
+
+				var key = (ByteString)kvp[0];
+				var tokenId = (ByteString)kvp[1];
+
+				rentList.Add((Rent)StdLib.Deserialize(TokenToRent[tokenId]));
+			}
+
+			var result = new object[] { rentList };
+			return StdLib.JsonSerialize(result);
 		}
 
 		[DisplayName("_deploy")]

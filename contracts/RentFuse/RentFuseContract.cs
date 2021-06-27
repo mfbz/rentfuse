@@ -22,10 +22,12 @@ namespace RentFuse
 
 		// TokenId -> Rent
 		private static StorageMap TokenToRent => new StorageMap(Storage.CurrentContext, "TokenToRent");
-		// Address+TokenId -> TokenId
+		// Address + TokenId -> TokenId
 		private static StorageMap OwnerToToken => new StorageMap(Storage.CurrentContext, "OwnerToToken");
-		// Address+TokenId -> TokenId
+		// Address + TokenId -> TokenId
 		private static StorageMap TenantToToken => new StorageMap(Storage.CurrentContext, "TenantToToken");
+		// NFT_TokenScriptHash + NFT_TokenId -> TokenId (Unique per NFT because it's used to check rent status)
+		private static StorageMap NFTToToken => new StorageMap(Storage.CurrentContext, "NFTToToken");
 
 		private static Transaction Tx => (Transaction)Runtime.ScriptContainer;
 
@@ -73,6 +75,9 @@ namespace RentFuse
 			// Check that the owner of the nft is the person that is calling the contract
 			if (!owner.Equals((UInt160)Tx.Sender) || !Runtime.CheckWitness(owner)) throw new Exception("Only the owner can lend a NFT");
 
+			// Check that the NFT has not been rented yet, a nft can only have 1 open rent
+			if (NFTToToken[nft.TokenScriptHash + nft.TokenId] != null) throw new Exception("A NFT can be assigned to only 1 token per time");
+
 			// Create a token id that is token count plus 1
 			BigInteger tokenCount = TokenCount();
 			tokenCount += 1;
@@ -96,10 +101,14 @@ namespace RentFuse
 
 			// Update global token count
 			Storage.Put(Storage.CurrentContext, "TokenCount", tokenCount);
+
 			// Assign token to rent object
 			TokenToRent.Put(rent.TokenId, StdLib.Serialize(rent));
 			// Assign token to owner
 			OwnerToToken.Put(rent.Owner + rent.TokenId, rent.TokenId);
+
+			// Assign token to nft
+			NFTToToken.Put(rent.NFT.TokenScriptHash + rent.NFT.TokenId, rent.TokenId);
 
 			// Fire event to notify that a token has been created
 			OnTokenCreated((ByteString)tokenCount, owner);
@@ -134,8 +143,15 @@ namespace RentFuse
 
 				// Save updated rent
 				TokenToRent.Put(tokenId, StdLib.Serialize(rent));
-				// Fire token closed event if it has been closed
-				if (rent.State == Rent.StateType.Closed) OnTokenClosed(tokenId, rent.Owner);
+
+				// Do final operations if the rent has been closed with this withdraw
+				if (rent.State == Rent.StateType.Closed)
+				{
+					// Clear nft assignment to token so that i can rent it again
+					NFTToToken.Delete(rent.NFT.TokenScriptHash + rent.NFT.TokenId);
+					// Fire token closed event if it has been closed
+					OnTokenClosed(tokenId, rent.Owner);
+				}
 
 				// Return true, everything went well
 				return true;
@@ -166,6 +182,9 @@ namespace RentFuse
 
 			// Save updated rent
 			TokenToRent.Put(tokenId, StdLib.Serialize(rent));
+			// Clear nft assignment to token so that i can rent it again
+			NFTToToken.Delete(rent.NFT.TokenScriptHash + rent.NFT.TokenId);
+
 			// Fire token closed event
 			OnTokenClosed(tokenId, rent.Owner);
 		}
@@ -187,6 +206,9 @@ namespace RentFuse
 			TokenToRent.Delete(tokenId);
 			// Delete token to account
 			OwnerToToken.Delete(rent.Owner + rent.TokenId);
+
+			// Clear nft assignment to token so that i can rent it again
+			NFTToToken.Delete(rent.NFT.TokenScriptHash + rent.NFT.TokenId);
 
 			// Fire token deleted event
 			OnTokenDeleted(tokenId, rent.Owner);

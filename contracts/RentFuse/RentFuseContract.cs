@@ -19,7 +19,13 @@ namespace RentFuse
 	{
 		private static ByteString OwnerAddress() => (ByteString)Storage.Get(Storage.CurrentContext, "OwnerAddress");
 		private static BigInteger TokenCount() => (BigInteger)Storage.Get(Storage.CurrentContext, "TokenCount");
+
+		// TokenId -> Rent
 		private static StorageMap TokenToRent => new StorageMap(Storage.CurrentContext, "TokenToRent");
+		// Address+TokenId -> TokenId
+		private static StorageMap OwnerToToken => new StorageMap(Storage.CurrentContext, "OwnerToToken");
+		// Address+TokenId -> TokenId
+		private static StorageMap TenantToToken => new StorageMap(Storage.CurrentContext, "TenantToToken");
 
 		private static Transaction Tx => (Transaction)Runtime.ScriptContainer;
 
@@ -91,7 +97,9 @@ namespace RentFuse
 			// Update global token count
 			Storage.Put(Storage.CurrentContext, "TokenCount", tokenCount);
 			// Assign token to rent object
-			TokenToRent.Put((ByteString)tokenCount, StdLib.Serialize(rent));
+			TokenToRent.Put(rent.TokenId, StdLib.Serialize(rent));
+			// Assign token to owner
+			OwnerToToken.Put(rent.Owner + rent.TokenId, rent.TokenId);
 
 			// Fire event to notify that a token has been created
 			OnTokenCreated((ByteString)tokenCount, owner);
@@ -177,6 +185,9 @@ namespace RentFuse
 
 			// Delete token rent
 			TokenToRent.Delete(tokenId);
+			// Delete token to account
+			OwnerToToken.Delete(rent.Owner + rent.TokenId);
+
 			// Fire token deleted event
 			OnTokenDeleted(tokenId, rent.Owner);
 		}
@@ -189,11 +200,10 @@ namespace RentFuse
 			return false;
 		}
 
-		// Return a map containing all tokens ids with associated rent
-		public static Map<ByteString, Rent> GetTokenToRentMap()
+		public static List<Rent> GetRentList()
 		{
-			// Create a map to be returned
-			Map<ByteString, Rent> map = new();
+			// Create the rent list that will be returned
+			List<Rent> rentList = new List<Rent>();
 
 			// Create an iterator on all token to rent deserializing them and removing key prefix
 			Iterator iterator = TokenToRent.Find(FindOptions.DeserializeValues | FindOptions.RemovePrefix);
@@ -201,11 +211,14 @@ namespace RentFuse
 			while (iterator.Next())
 			{
 				var kvp = (object[])iterator.Value;
+
 				var key = (ByteString)kvp[0];
-				map[key] = (Rent)kvp[1];
+				var value = (Rent)kvp[1];
+
+				rentList.Add(value);
 			}
 
-			return map;
+			return rentList;
 		}
 
 		[DisplayName("_deploy")]
@@ -284,6 +297,8 @@ namespace RentFuse
 
 			// Save updated rent
 			TokenToRent.Put(tokenId, StdLib.Serialize(rent));
+			// Assign token to account
+			TenantToToken.Put(rent.Tenant + rent.TokenId, rent.TokenId);
 
 			// Fire event to notify that a token has been created
 			OnTokenRented(tokenId, tenant);

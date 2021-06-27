@@ -68,6 +68,8 @@ namespace RentFuse
 			}
 		}
 
+		public static BigInteger TotalSupply() => TokenCount();
+
 		public static void CreateToken(NFT nft, BigInteger price, ulong duration)
 		{
 			// Call nft contract to get the owner of the nft and check if it exists (Only the owner of an nft can lend a token)
@@ -220,6 +222,8 @@ namespace RentFuse
 
 			return false;
 		}
+
+		// 
 
 		public static List<Rent> GetRentList()
 		{

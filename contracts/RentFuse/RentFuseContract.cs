@@ -34,6 +34,9 @@ namespace RentFuse
 		// Fires whenever a token rent is paid (providing the token ID and the address of the tenant)
 		[DisplayName("TokenPaid")]
 		public static event Action<ByteString, UInt160> OnTokenPaid;
+		// Fires whenever a token rent is closed (providing the token ID and the address of the owner)
+		[DisplayName("TokenClosed")]
+		public static event Action<ByteString, UInt160> OnTokenClosed;
 
 		public static void OnNEP17Payment(UInt160 from, BigInteger amount, NEP17PaymentData data)
 		{
@@ -121,6 +124,10 @@ namespace RentFuse
 
 				// Save updated rent
 				TokenToRent.Put(tokenId, StdLib.Serialize(rent));
+				// Fire token closed event if it has been closed
+				if (rent.State == Rent.StateType.Closed) OnTokenClosed(tokenId, rent.Owner);
+
+				// Return true, everything went well
 				return true;
 			}
 
@@ -149,6 +156,8 @@ namespace RentFuse
 
 			// Save updated rent
 			TokenToRent.Put(tokenId, StdLib.Serialize(rent));
+			// Fire token closed event
+			OnTokenClosed(tokenId, rent.Owner);
 		}
 
 		// Delete the rent if it's open and the owner don't want it anymore

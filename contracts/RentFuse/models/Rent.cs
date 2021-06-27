@@ -18,8 +18,8 @@ namespace RentFuse.Models
 		public UInt160 Tenant;
 		public NFT NFT;
 		public BigInteger Price;
-		public BigInteger Balance; // The balance available to the rent as example for withdrawing 
-		public BigInteger Amount; // The amount of the rent paid
+		public BigInteger Balance; // The balance available to the rent as example for withdrawing (+ and -) 
+		public BigInteger Amount; // The amount of the rent paid (only +)
 		public StateType State;
 		public ulong Duration;
 		public ulong CreatedOn;
@@ -31,10 +31,30 @@ namespace RentFuse.Models
 			return Balance;
 		}
 
-		public bool IsCompleted()
+		public BigInteger GetTotalCost()
 		{
-			// Is considered completed if the tenant has paid it all and the duration is concluded
-			return (Amount >= Price * TimeSpan.FromMilliseconds(Duration).Days) && (Runtime.Time >= RentedOn + Duration);
+			return Price * TimeSpan.FromMilliseconds(Duration).Days;
+		}
+
+		public bool IsFilled()
+		{
+			return Amount >= GetTotalCost();
+		}
+
+		public bool IsFinished()
+		{
+			return Runtime.Time > RentedOn + Duration;
+		}
+
+		public bool IsExpired()
+		{
+			ulong now = Runtime.Time;
+
+			// Fix ending date as maximum rent max duration
+			if (now > RentedOn + Duration)
+				now = RentedOn + Duration;
+
+			return Amount < Price * TimeSpan.FromMilliseconds(now - RentedOn).Days;
 		}
 	}
 }

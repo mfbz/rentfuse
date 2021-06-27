@@ -92,6 +92,7 @@ namespace RentFuse
 			OnTokenCreated((ByteString)tokenCount, owner);
 		}
 
+		// Withdraw available balance from token rent and close it if it's terminated, it's like the terminating function
 		public bool WithdrawRent(ByteString tokenId)
 		{
 			ValidateToken(tokenId);
@@ -112,7 +113,7 @@ namespace RentFuse
 				// Update balance decreasing it by withdrawn amount
 				rent.Balance = rent.Balance - withdrawableAmount;
 				// Check if the rent is finished and if so set it as closed
-				if (rent.IsCompleted())
+				if (rent.IsFilled() && rent.IsFinished())
 				{
 					rent.State = Rent.StateType.Closed;
 					rent.ClosedOn = Runtime.Time;
@@ -125,6 +126,29 @@ namespace RentFuse
 
 			// As default return that the withdraw doesn't went well
 			return false;
+		}
+
+		// Revoke the rent if the tenant doesn't pay and the rent is expired
+		public void RevokeRent(ByteString tokenId)
+		{
+			ValidateToken(tokenId);
+
+			// Get the rent associated with the token
+			Rent rent = (Rent)StdLib.Deserialize(TokenToRent[tokenId]);
+
+			// Check that the address calling this function is the owner of the rent
+			if (!rent.Owner.Equals((UInt160)Tx.Sender) || !Runtime.CheckWitness(rent.Owner)) throw new Exception("Only the owner can withdraw token rent");
+			// Check that the rent is in rented state, otherwise i cannot close it
+			if (rent.State != Rent.StateType.Rented) throw new Exception("You cannot close a token that has not been rented");
+			// Check that the rent has been completed or that the tenant has not paid it
+			if (!rent.IsExpired()) throw new Exception("You can revoke only an expired rent");
+
+			// Update the rent
+			rent.State = Rent.StateType.Closed;
+			rent.ClosedOn = Runtime.Time;
+
+			// Save updated rent
+			TokenToRent.Put(tokenId, StdLib.Serialize(rent));
 		}
 
 		[DisplayName("_deploy")]

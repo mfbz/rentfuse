@@ -139,7 +139,7 @@ namespace RentFuse
 			// Check that the address calling this function is the owner of the rent
 			if (!rent.Owner.Equals((UInt160)Tx.Sender) || !Runtime.CheckWitness(rent.Owner)) throw new Exception("Only the owner can withdraw token rent");
 			// Check that the rent is in rented state, otherwise i cannot close it
-			if (rent.State != Rent.StateType.Rented) throw new Exception("You cannot close a token that has not been rented");
+			if (rent.State != Rent.StateType.Rented) throw new Exception("You cannot revoke a token that is not rented");
 			// Check that the rent has been completed or that the tenant has not paid it
 			if (!rent.IsExpired()) throw new Exception("You can revoke only an expired rent");
 
@@ -149,6 +149,23 @@ namespace RentFuse
 
 			// Save updated rent
 			TokenToRent.Put(tokenId, StdLib.Serialize(rent));
+		}
+
+		// Delete the rent if it's open and the owner don't want it anymore
+		public void DeleteRent(ByteString tokenId)
+		{
+			ValidateToken(tokenId);
+
+			// Get the rent associated with the token
+			Rent rent = (Rent)StdLib.Deserialize(TokenToRent[tokenId]);
+
+			// Check that the address calling this function is the owner of the rent
+			if (!rent.Owner.Equals((UInt160)Tx.Sender) || !Runtime.CheckWitness(rent.Owner)) throw new Exception("Only the owner can withdraw token rent");
+			// Check that the rent is in open state, otherwise i cannot close it
+			if (rent.State != Rent.StateType.Open) throw new Exception("You cannot delete a token that is not open");
+
+			// Delete token rent
+			TokenToRent.Delete(tokenId);
 		}
 
 		[DisplayName("_deploy")]

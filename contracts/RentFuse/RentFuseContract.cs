@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Numerics;
 
 using Neo;
@@ -17,6 +18,7 @@ namespace RentFuse
 	[ManifestExtra("Version", "1.0.0")]
 	public class RentFuseContract : SmartContract
 	{
+		private const int MAX_GET_COUNT = 100;
 		private static ByteString OwnerAddress() => (ByteString)Storage.Get(Storage.CurrentContext, "OwnerAddress");
 		private static BigInteger TokenCount() => (BigInteger)Storage.Get(Storage.CurrentContext, "TokenCount");
 
@@ -43,9 +45,6 @@ namespace RentFuse
 		// Fires whenever a token rent is closed (providing the token ID and the address of the owner)
 		[DisplayName("TokenClosed")]
 		public static event Action<ByteString, UInt160> OnTokenClosed;
-		// Fires whenever a token rent is deleted (providing the token ID and the address of the owner)
-		[DisplayName("TokenDeleted")]
-		public static event Action<ByteString, UInt160> OnTokenDeleted;
 
 		public static void OnNEP17Payment(UInt160 from, BigInteger amount, NEP17PaymentData data)
 		{
@@ -67,8 +66,6 @@ namespace RentFuse
 					throw new Exception("Invalid action");
 			}
 		}
-
-		public static BigInteger TotalSupply() => TokenCount();
 
 		public static void CreateToken(NFT nft, BigInteger price, ulong duration)
 		{
@@ -170,7 +167,7 @@ namespace RentFuse
 			if (!rent.Owner.Equals((UInt160)Tx.Sender) || !Runtime.CheckWitness(rent.Owner)) throw new Exception("Only the owner can withdraw token rent");
 			// Check that the rent is in rented state, otherwise i cannot close it
 			if (rent.State != Rent.StateType.Rented) throw new Exception("You cannot revoke a token that is not rented");
-			// Check that the rent has been completed or that the tenant has not paid it
+			// Check that the the tenant is in time with payment
 			if (!rent.IsExpired()) throw new Exception("You can revoke only an expired rent");
 
 			// Update the rent
@@ -184,8 +181,8 @@ namespace RentFuse
 			OnTokenClosed(tokenId, rent.Owner);
 		}
 
-		// Delete the rent if it's open and the owner don't want it anymore
-		public static void DeleteRent(ByteString tokenId)
+		// Close the rent if it's open and the owner doesn't want it anymore
+		public static void CloseRent(ByteString tokenId)
 		{
 			ValidateToken(tokenId);
 
@@ -195,15 +192,17 @@ namespace RentFuse
 			// Check that the address calling this function is the owner of the rent
 			if (!rent.Owner.Equals((UInt160)Tx.Sender) || !Runtime.CheckWitness(rent.Owner)) throw new Exception("Only the owner can withdraw token rent");
 			// Check that the rent is in open state, otherwise i cannot close it
-			if (rent.State != Rent.StateType.Open) throw new Exception("You cannot delete a token that is not open");
+			if (rent.State != Rent.StateType.Open) throw new Exception("You cannot close a token that is not open");
 
-			// Delete token rent
-			TokenToRent.Delete(tokenId);
-			// Delete token to account
-			OwnerToToken.Delete(rent.Owner + rent.TokenId);
+			// Update the rent
+			rent.State = Rent.StateType.Closed;
+			rent.ClosedOn = Runtime.Time;
 
-			// Fire token deleted event
-			OnTokenDeleted(tokenId, rent.Owner);
+			// Save updated rent
+			TokenToRent.Put(tokenId, StdLib.Serialize(rent));
+
+			// Fire token closed event
+			OnTokenClosed(tokenId, rent.Owner);
 		}
 
 		// Check if an nft is in rented state
@@ -231,20 +230,24 @@ namespace RentFuse
 			return rent;
 		}
 
-		public static List<Rent> GetRentList()
+		// Get a list of all the rents in the contracts, if reached max value returnable
+		// startingIndex needs to be used for pagination purpose
+		public static List<Rent> GetRentList(BigInteger startingIndex)
 		{
+			BigInteger finalIndex = startingIndex + MAX_GET_COUNT;
+
 			// Create the rent list that will be returned
 			List<Rent> rentList = new List<Rent>();
 
-			// Create an iterator on all token to rent deserializing them and removing key prefix
-			Iterator iterator = TokenToRent.Find(FindOptions.DeserializeValues | FindOptions.RemovePrefix);
+			// Create an iterator on all tokens removing key prefix
+			Iterator iterator = TokenToRent.Find(FindOptions.RemovePrefix);
 			// Iterate on the iterator to get a map of the token and rents
 			while (iterator.Next())
 			{
 				var kvp = (object[])iterator.Value;
 
 				var key = (ByteString)kvp[0];
-				var rent = (Rent)kvp[1];
+				var rent = (Rent)StdLib.Deserialize((ByteString)kvp[1]);
 
 				rentList.Add(rent);
 			}
@@ -259,7 +262,7 @@ namespace RentFuse
 			// Create the rent list that will be returned
 			List<Rent> rentList = new List<Rent>();
 
-			// Create an iterator on all token to rent deserializing them and removing key prefix
+			// Create an iterator on all owner tokens removing key prefix
 			Iterator iterator = OwnerToToken.Find(owner, FindOptions.RemovePrefix);
 			// Iterate on the iterator to get a map of the token and rents
 			while (iterator.Next())
@@ -282,7 +285,7 @@ namespace RentFuse
 			// Create the rent list that will be returned
 			List<Rent> rentList = new List<Rent>();
 
-			// Create an iterator on all token to rent deserializing them and removing key prefix
+			// Create an iterator on all tenant tokens removing key prefix
 			Iterator iterator = TenantToToken.Find(tenant, FindOptions.RemovePrefix);
 			// Iterate on the iterator to get a map of the token and rents
 			while (iterator.Next())

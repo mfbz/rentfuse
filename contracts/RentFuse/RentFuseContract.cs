@@ -223,17 +223,15 @@ namespace RentFuse
 			return false;
 		}
 
-		public static string GetRent(ByteString tokenId)
+		public static Rent GetRent(ByteString tokenId)
 		{
 			ValidateToken(tokenId);
 			Rent rent = (Rent)StdLib.Deserialize(TokenToRent[tokenId]);
 
-			// Return a JSON representation of the object in array like form
-			var result = new object[] { rent };
-			return StdLib.JsonSerialize(result);
+			return rent;
 		}
 
-		public static string GetRentList()
+		public static List<Rent> GetRentList()
 		{
 			// Create the rent list that will be returned
 			List<Rent> rentList = new List<Rent>();
@@ -251,11 +249,10 @@ namespace RentFuse
 				rentList.Add(rent);
 			}
 
-			var result = new object[] { rentList };
-			return StdLib.JsonSerialize(result);
+			return rentList;
 		}
 
-		public static string GetRentListAsOwner(UInt160 owner)
+		public static List<Rent> GetRentListAsOwner(UInt160 owner)
 		{
 			ValidateAddress(owner);
 
@@ -275,11 +272,10 @@ namespace RentFuse
 				rentList.Add((Rent)StdLib.Deserialize(TokenToRent[tokenId]));
 			}
 
-			var result = new object[] { rentList };
-			return StdLib.JsonSerialize(result);
+			return rentList;
 		}
 
-		public static string GetRentListAsTenant(UInt160 tenant)
+		public static List<Rent> GetRentListAsTenant(UInt160 tenant)
 		{
 			ValidateAddress(tenant);
 
@@ -299,8 +295,7 @@ namespace RentFuse
 				rentList.Add((Rent)StdLib.Deserialize(TokenToRent[tokenId]));
 			}
 
-			var result = new object[] { rentList };
-			return StdLib.JsonSerialize(result);
+			return rentList;
 		}
 
 		[DisplayName("_deploy")]

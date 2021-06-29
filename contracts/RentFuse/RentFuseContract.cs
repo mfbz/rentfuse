@@ -242,71 +242,64 @@ namespace RentFuse
 			return rent;
 		}
 
-		// Get a list of all the rents in the contracts, if reached max value returnable
-		// startingIndex needs to be used for pagination purpose
-		public static List<Rent> GetRentList(BigInteger startingIndex)
+		// Get a rent list in descending order from index (inclusive) or last one if passed 0 (default for BigInteger)
+		public static List<Rent> GetRentList(BigInteger fromIndex)
 		{
-			BigInteger finalIndex = startingIndex + MAX_GET_COUNT;
+			BigInteger tokenCount = TokenCount();
+			// Check that fromIndex is valid
+			if (fromIndex < 0 || fromIndex > tokenCount) throw new Exception("Invalid starting index");
 
-			// Create the rent list that will be returned
+			// Initialize an empty list that will be returned filled with rent found
 			List<Rent> rentList = new List<Rent>();
-
-			// Create an iterator on all tokens removing key prefix
-			Iterator iterator = TokenToRent.Find(FindOptions.RemovePrefix);
-			// Iterate on the iterator to get a map of the token and rents
-			while (iterator.Next())
+			// Cycle starting from last index until final index calculated considering the max record i can return from a GET
+			for (BigInteger i = (fromIndex == 0) ? tokenCount : fromIndex; i > ((fromIndex - MAX_GET_COUNT > 0) ? (fromIndex - MAX_GET_COUNT) : 0); i--)
 			{
-				var kvp = (object[])iterator.Value;
-
-				var key = (ByteString)kvp[0];
-				var rent = (Rent)StdLib.Deserialize((ByteString)kvp[1]);
-
-				rentList.Add(rent);
+				rentList.Add((Rent)StdLib.Deserialize(TokenToRent[(ByteString)i]));
 			}
 
 			return rentList;
 		}
 
-		public static List<Rent> GetRentListAsOwner(UInt160 owner)
+		// Get rent list as owner of rent token with pagination through fromIndex arg
+		public static List<Rent> GetRentListAsOwner(UInt160 owner, BigInteger fromIndex)
 		{
 			ValidateAddress(owner);
 
-			// Create the rent list that will be returned
+			BigInteger tokenCount = (BigInteger)OwnerToTokenCount[(ByteString)owner];
+			// Check that fromIndex is valid
+			if (fromIndex < 0 || fromIndex > tokenCount) throw new Exception("Invalid starting index");
+
+			// Initialize an empty list that will be returned filled with rent found
 			List<Rent> rentList = new List<Rent>();
-
-			// Create an iterator on all owner tokens removing key prefix
-			Iterator iterator = OwnerToToken.Find(owner, FindOptions.RemovePrefix);
-			// Iterate on the iterator to get a map of the token and rents
-			while (iterator.Next())
+			// Cycle starting from last index until final index calculated considering the max record i can return from a GET
+			for (BigInteger i = (fromIndex == 0) ? tokenCount : fromIndex; i > ((fromIndex - MAX_GET_COUNT > 0) ? (fromIndex - MAX_GET_COUNT) : 0); i--)
 			{
-				var kvp = (object[])iterator.Value;
-
-				var key = (ByteString)kvp[0];
-				var tokenId = (ByteString)kvp[1];
-
+				// Get the token id at index i
+				ByteString tokenId = OwnerToToken[(ByteString)i];
+				// Get token at id and add to rent list
 				rentList.Add((Rent)StdLib.Deserialize(TokenToRent[tokenId]));
 			}
 
 			return rentList;
 		}
 
-		public static List<Rent> GetRentListAsTenant(UInt160 tenant)
+		// Get rent list as tenant of rent token with pagination through fromIndex arg
+		public static List<Rent> GetRentListAsTenant(UInt160 tenant, BigInteger fromIndex)
 		{
 			ValidateAddress(tenant);
 
-			// Create the rent list that will be returned
+			BigInteger tokenCount = (BigInteger)TenantToTokenCount[(ByteString)tenant];
+			// Check that fromIndex is valid
+			if (fromIndex < 0 || fromIndex > tokenCount) throw new Exception("Invalid starting index");
+
+			// Initialize an empty list that will be returned filled with rent found
 			List<Rent> rentList = new List<Rent>();
-
-			// Create an iterator on all tenant tokens removing key prefix
-			Iterator iterator = TenantToToken.Find(tenant, FindOptions.RemovePrefix);
-			// Iterate on the iterator to get a map of the token and rents
-			while (iterator.Next())
+			// Cycle starting from last index until final index calculated considering the max record i can return from a GET
+			for (BigInteger i = (fromIndex == 0) ? tokenCount : fromIndex; i > ((fromIndex - MAX_GET_COUNT > 0) ? (fromIndex - MAX_GET_COUNT) : 0); i--)
 			{
-				var kvp = (object[])iterator.Value;
-
-				var key = (ByteString)kvp[0];
-				var tokenId = (ByteString)kvp[1];
-
+				// Get the token id at index i
+				ByteString tokenId = TenantToToken[(ByteString)i];
+				// Get token at id and add to rent list
 				rentList.Add((Rent)StdLib.Deserialize(TokenToRent[tokenId]));
 			}
 

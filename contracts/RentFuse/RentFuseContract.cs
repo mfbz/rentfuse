@@ -19,15 +19,22 @@ namespace RentFuse
 	public class RentFuseContract : SmartContract
 	{
 		private const int MAX_GET_COUNT = 100;
+
+		// The address of the owner of the contract
 		private static ByteString OwnerAddress() => (ByteString)Storage.Get(Storage.CurrentContext, "OwnerAddress");
+		// The total token count minted
 		private static BigInteger TokenCount() => (BigInteger)Storage.Get(Storage.CurrentContext, "TokenCount");
 
-		// TokenId -> Rent
+		// TokenId -> Rent (NB: Token are never deleted!)
 		private static StorageMap TokenToRent => new StorageMap(Storage.CurrentContext, "TokenToRent");
-		// Address + TokenId -> TokenId
+		// Address + Index -> TokenId
 		private static StorageMap OwnerToToken => new StorageMap(Storage.CurrentContext, "OwnerToToken");
-		// Address + TokenId -> TokenId
+		// Address -> LastIndex (count)
+		private static StorageMap OwnerToTokenCount => new StorageMap(Storage.CurrentContext, "OwnerToTokenCount");
+		// Address + Index -> TokenId
 		private static StorageMap TenantToToken => new StorageMap(Storage.CurrentContext, "TenantToToken");
+		// Address -> LastIndex (count)
+		private static StorageMap TenantToTokenCount => new StorageMap(Storage.CurrentContext, "TenantToTokenCount");
 		// NFT_TokenScriptHash + NFT_TokenId -> TokenId (Unique per NFT because it's used to check rent status)
 		private static StorageMap NFTToToken => new StorageMap(Storage.CurrentContext, "NFTToToken");
 
@@ -102,8 +109,13 @@ namespace RentFuse
 
 			// Assign token to rent object
 			TokenToRent.Put(rent.TokenId, StdLib.Serialize(rent));
-			// Assign token to owner
-			OwnerToToken.Put(rent.Owner + rent.TokenId, rent.TokenId);
+
+			// Calculate owner token new count
+			BigInteger ownerTokenCount = (BigInteger)OwnerToTokenCount[rent.Owner];
+			ownerTokenCount += 1;
+			// Save the value in its storage map
+			OwnerToToken.Put(rent.Owner + ownerTokenCount, rent.TokenId);
+			OwnerToTokenCount.Put(rent.Owner, ownerTokenCount);
 
 			// Assign token to nft
 			NFTToToken.Put(rent.NFT.TokenScriptHash + rent.NFT.TokenId, rent.TokenId);
@@ -377,8 +389,13 @@ namespace RentFuse
 
 			// Save updated rent
 			TokenToRent.Put(tokenId, StdLib.Serialize(rent));
-			// Assign token to account
-			TenantToToken.Put(rent.Tenant + rent.TokenId, rent.TokenId);
+
+			// Calculate tenant token new count
+			BigInteger tenantTokenCount = (BigInteger)TenantToTokenCount[rent.Tenant];
+			tenantTokenCount += 1;
+			// Save the value in its storage map
+			TenantToToken.Put(rent.Tenant + tenantTokenCount, rent.TokenId);
+			TenantToTokenCount.Put(rent.Tenant, tenantTokenCount);
 
 			// Fire event to notify that a token has been created
 			OnTokenRented(tokenId, tenant);

@@ -1,4 +1,3 @@
-using System;
 using System.Numerics;
 using Neo;
 using Neo.SmartContract.Framework;
@@ -35,7 +34,7 @@ namespace RentFuse.Models
 
 		public BigInteger GetTotalCost()
 		{
-			return Price * TimeSpan.FromMilliseconds(Duration).Days;
+			return Price * GetDays(Duration);
 		}
 
 		public bool IsFilled()
@@ -56,7 +55,13 @@ namespace RentFuse.Models
 			if (now > RentedOn + Duration)
 				now = RentedOn + Duration;
 
-			return Amount < Price * TimeSpan.FromMilliseconds(now - RentedOn).Days;
+			return Amount < Price * GetDays(now - RentedOn);
+		}
+
+		private int GetDays(ulong durationMS)
+		{
+			ulong oneDayMS = 1000 * 60 * 60 * 24;
+			return (int)(durationMS / oneDayMS);
 		}
 	}
 }

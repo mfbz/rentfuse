@@ -8,7 +8,12 @@
 	},
 	"dependencies": {
 		"@ant-design/icons": "^4.6.2",
-		"@cityofzion/neon-js": "^4.9.0",
+		"@cityofzion/neon-js": "^5.0.0-next.10",
+		"@cityofzion/wallet-connect-sdk-react": "0.0.11",
+		"@walletconnect/client": "^2.0.0-alpha.42",
+    "@walletconnect/qrcode-modal": "^2.0.0-alpha.20",
+    "@walletconnect/types": "^2.0.0-alpha.42",
+    "@walletconnect/utils": "^2.0.0-alpha.42",
 		"@zeit/next-css": "^1.0.1",
 		"@zeit/next-less": "^1.0.1",
 		"antd": "^4.15.2",

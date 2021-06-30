@@ -79,8 +79,10 @@ namespace RentFuse
 			UInt160 owner = (UInt160)Contract.Call(nft.TokenScriptHash, "ownerOf", CallFlags.ReadOnly, new object[] { nft.TokenId });
 			// Check that the owner of the nft is the person that is calling the contract
 			if (!owner.Equals((UInt160)Tx.Sender) || !Runtime.CheckWitness(owner)) throw new Exception("Only the owner can lend a NFT");
+			// Check that the NFT is not listed in a open token
+			if (IsNFTListed(nft)) throw new Exception("The NFT is already listed");
 			// Check that the NFT has not been rented yet, a nft can only have 1 open rent
-			if (IsRented(nft)) throw new Exception("Cannot create a token for a rented NFT");
+			if (IsNFTRented(nft)) throw new Exception("The NFT is already rented");
 
 			// Create a token id that is token count plus 1
 			BigInteger tokenCount = TokenCount();
@@ -123,7 +125,7 @@ namespace RentFuse
 			OnTokenCreated((ByteString)tokenCount, owner);
 		}
 
-		// Withdraw available balance from token rent and close it if it's terminated, it's like the terminating function
+		// Withdraw available balance from token rent and close it if it's terminated
 		public static bool WithdrawRent(ByteString tokenId)
 		{
 			ValidateToken(tokenId);
@@ -141,22 +143,25 @@ namespace RentFuse
 			// Transfer the amount to rent owner and update rent balance to prevent further withdraw
 			if (GAS.Transfer(Runtime.ExecutingScriptHash, rent.Owner, withdrawableAmount))
 			{
+				// Variable indicating if the rent has been closed now to emit the correct event
+				bool hasClosed = false;
+
 				// Update balance decreasing it by withdrawn amount
 				rent.Balance = rent.Balance - withdrawableAmount;
-				// Check if the rent is finished and if so set it as closed
-				if (rent.IsFilled() && rent.IsFinished())
+				// Check if the rent is finished and not already closed if so set it as closed
+				if (rent.IsFilled() && rent.IsFinished() && rent.State != Rent.StateType.Closed)
 				{
 					rent.State = Rent.StateType.Closed;
 					rent.ClosedOn = Runtime.Time;
+
+					hasClosed = true;
 				}
 
 				// Save updated rent
 				TokenToRent.Put(tokenId, StdLib.Serialize(rent));
 
-				// Do final operations if the rent has been closed with this withdraw
-				if (rent.State == Rent.StateType.Closed)
-					// Fire token closed event if it has been closed
-					OnTokenClosed(tokenId, rent.Owner);
+				// Emit closed event if rent has been closed with this withdraw operation
+				if (hasClosed) OnTokenClosed(tokenId, rent.Owner);
 
 				// Return true, everything went well
 				return true;
@@ -192,7 +197,7 @@ namespace RentFuse
 			OnTokenClosed(tokenId, rent.Owner);
 		}
 
-		// Close the rent if it's open and the owner doesn't want it anymore
+		// Close the rent if it's open and the owner doesn't want it anymore or if rented and all concluded
 		public static void CloseRent(ByteString tokenId)
 		{
 			ValidateToken(tokenId);
@@ -202,8 +207,10 @@ namespace RentFuse
 
 			// Check that the address calling this function is the owner of the rent
 			if (!rent.Owner.Equals((UInt160)Tx.Sender) || !Runtime.CheckWitness(rent.Owner)) throw new Exception("Only the owner can withdraw token rent");
-			// Check that the rent is in open state, otherwise i cannot close it
-			if (rent.State != Rent.StateType.Open) throw new Exception("You cannot close a token that is not open");
+			// Check that the rent is not already closed
+			if (rent.State == Rent.StateType.Closed) throw new Exception("You cannot close a token that is already closed");
+			// Check that the token is not still rented
+			if (rent.State == Rent.StateType.Rented && !rent.IsFinished()) throw new Exception("You cannot close a token that is still rented");
 
 			// Update the rent
 			rent.State = Rent.StateType.Closed;
@@ -216,8 +223,8 @@ namespace RentFuse
 			OnTokenClosed(tokenId, rent.Owner);
 		}
 
-		// Check if an nft is in rented state
-		public static bool IsRented(NFT nft)
+		// Check if a nft is rented or not
+		public static bool IsNFTRented(NFT nft)
 		{
 			// Get the token id associated to input nft if any
 			ByteString tokenId = NFTToToken[nft.TokenScriptHash + nft.TokenId];
@@ -226,8 +233,25 @@ namespace RentFuse
 				// Get the rent associated with the token
 				Rent rent = (Rent)StdLib.Deserialize(TokenToRent[tokenId]);
 
-				// It's considered rented if the associated token has rented status otherwise no
-				return rent.State == Rent.StateType.Rented;
+				// It's considered rented if the associated token has rented status not finished
+				return rent.State == Rent.StateType.Rented && !rent.IsFinished();
+			}
+
+			return false;
+		}
+
+		// Check if a nft is listed or not
+		public static bool IsNFTListed(NFT nft)
+		{
+			// Get the token id associated to input nft if any
+			ByteString tokenId = NFTToToken[nft.TokenScriptHash + nft.TokenId];
+			if (tokenId != null)
+			{
+				// Get the rent associated with the token
+				Rent rent = (Rent)StdLib.Deserialize(TokenToRent[tokenId]);
+
+				// It's considered listed if it's in a open state
+				return rent.State == Rent.StateType.Open;
 			}
 
 			return false;

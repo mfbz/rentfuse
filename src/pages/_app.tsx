@@ -11,6 +11,8 @@ export default function _App({ Component, pageProps }: AppProps) {
 			<Head>
 				<link rel="shortcut icon" href="favicon/favicon.ico" />
 				<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" />
+
+				<meta name="description" content="Peer to peer renting of Neo N3 NFTs" />
 			</Head>
 
 			<Component {...pageProps} />

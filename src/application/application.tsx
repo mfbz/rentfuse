@@ -17,7 +17,7 @@ export const Application = React.memo(function Application({ children }: { child
 					'https://raw.githubusercontent.com/mfbz/rentfuse/4a256a86a5498e7aed0f12cbd32f36eec60f4188/rentfuse_icon.svg',
 				],
 			},
-			chainId: 'neo3:ihavenoidea',
+			chainId: 'neo3:testnet',
 			logger: 'debug',
 			methods: ['invokefunction'],
 			relayServer: 'wss://connect.coz.io:443',

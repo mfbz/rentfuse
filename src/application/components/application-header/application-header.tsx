@@ -1,11 +1,17 @@
+import { useWalletConnect } from '@cityofzion/wallet-connect-sdk-react';
 import { Layout, Space } from 'antd';
 import React from 'react';
+import { useCallback } from 'react';
 import { ApplicationLogo } from '../application-logo';
 import { ApplicationWalletButton } from './components/application-wallet-button';
 
 export const HEADER_HEIGHT = 80;
 
 export const ApplicationHeader = React.memo(function ApplicationHeader({}: {}) {
+	const walletConnectCtx = useWalletConnect();
+
+	const onConnectWallet = useCallback(() => walletConnectCtx.connect(), [walletConnectCtx]);
+
 	return (
 		<div>
 			<Layout.Header className={'a-header'}>
@@ -14,7 +20,7 @@ export const ApplicationHeader = React.memo(function ApplicationHeader({}: {}) {
 						<ApplicationLogo />
 
 						<Space>
-							<ApplicationWalletButton />
+							<ApplicationWalletButton loading={walletConnectCtx.loadingSession} onClick={onConnectWallet} />
 						</Space>
 					</div>
 				</div>

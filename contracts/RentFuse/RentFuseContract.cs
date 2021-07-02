@@ -52,37 +52,38 @@ namespace RentFuse
 		[DisplayName("TokenClosed")]
 		public static event Action<ByteString, UInt160> OnTokenClosed;
 
-		public static void OnNEP17Payment(UInt160 from, BigInteger amount, NEP17PaymentData data)
+		// data contains [action: Integer, tokenId: ByteString]
+		public static void OnNEP17Payment(UInt160 from, BigInteger amount, object[] data)
 		{
 			ValidateAddress(from);
 			if (Runtime.CallingScriptHash != GAS.Hash) throw new Exception("RentFuse only accepts GAS tokens");
 			if (amount <= 0) throw new Exception("Invalid payment amount");
-			if (data == null) throw new Exception("Invalid data argument");
+			if (data == null || data.Length != 2) throw new Exception("Invalid data argument");
 
 			// Execute a different function depending on data action
-			switch (data.Action)
+			switch (data[0])
 			{
-				case NEP17PaymentData.ActionType.RentToken:
-					RentToken((ByteString)data.Payload[0], from, amount);
+				case 0:
+					RentToken((ByteString)data[1], from, amount);
 					break;
-				case NEP17PaymentData.ActionType.PayToken:
-					PayToken((ByteString)data.Payload[0], from, amount);
+				case 1:
+					PayToken((ByteString)data[1], from, amount);
 					break;
 				default:
 					throw new Exception("Invalid action");
 			}
 		}
 
-		public static void CreateToken(NFT nft, BigInteger price, ulong duration)
+		public static void CreateToken(UInt160 NFTScriptHash, ByteString NFTTokenId, BigInteger price, ulong duration)
 		{
 			// Call nft contract to get the owner of the nft and check if it exists (Only the owner of an nft can lend a token)
-			UInt160 owner = (UInt160)Contract.Call(nft.TokenScriptHash, "ownerOf", CallFlags.ReadOnly, new object[] { nft.TokenId });
+			UInt160 owner = (UInt160)Contract.Call(NFTScriptHash, "ownerOf", CallFlags.ReadOnly, new object[] { NFTTokenId });
 			// Check that the owner of the nft is the person that is calling the contract
 			if (!owner.Equals((UInt160)Tx.Sender) || !Runtime.CheckWitness(owner)) throw new Exception("Only the owner can lend a NFT");
 			// Check that the NFT is not listed in a open token
-			if (IsNFTListed(nft)) throw new Exception("The NFT is already listed");
+			if (IsNFTListed(NFTScriptHash, NFTTokenId)) throw new Exception("The NFT is already listed");
 			// Check that the NFT has not been rented yet, a nft can only have 1 open rent
-			if (IsNFTRented(nft)) throw new Exception("The NFT is already rented");
+			if (IsNFTRented(NFTScriptHash, NFTTokenId)) throw new Exception("The NFT is already rented");
 
 			// Create a token id that is token count plus 1
 			BigInteger tokenCount = TokenCount();
@@ -94,7 +95,8 @@ namespace RentFuse
 				TokenId = (ByteString)tokenCount,
 				Owner = owner,
 				Tenant = null,
-				NFT = nft,
+				NFTScriptHash = NFTScriptHash,
+				NFTTokenId = NFTTokenId,
 				Price = price,
 				Balance = 0,
 				Amount = 0,
@@ -119,7 +121,7 @@ namespace RentFuse
 			OwnerToTokenCount.Put(rent.Owner, ownerTokenCount);
 
 			// Assign token to nft
-			NFTToToken.Put(rent.NFT.TokenScriptHash + rent.NFT.TokenId, rent.TokenId);
+			NFTToToken.Put(rent.NFTScriptHash + rent.NFTTokenId, rent.TokenId);
 
 			// Fire event to notify that a token has been created
 			OnTokenCreated((ByteString)tokenCount, owner);
@@ -224,10 +226,10 @@ namespace RentFuse
 		}
 
 		// Check if a nft is rented or not
-		public static bool IsNFTRented(NFT nft)
+		public static bool IsNFTRented(UInt160 NFTScriptHash, ByteString NFTTokenId)
 		{
 			// Get the token id associated to input nft if any
-			ByteString tokenId = NFTToToken[nft.TokenScriptHash + nft.TokenId];
+			ByteString tokenId = NFTToToken[(ByteString)NFTScriptHash + NFTTokenId];
 			if (tokenId != null)
 			{
 				// Get the rent associated with the token
@@ -241,10 +243,10 @@ namespace RentFuse
 		}
 
 		// Check if a nft is listed or not
-		public static bool IsNFTListed(NFT nft)
+		public static bool IsNFTListed(UInt160 NFTScriptHash, ByteString NFTTokenId)
 		{
 			// Get the token id associated to input nft if any
-			ByteString tokenId = NFTToToken[nft.TokenScriptHash + nft.TokenId];
+			ByteString tokenId = NFTToToken[(ByteString)NFTScriptHash + NFTTokenId];
 			if (tokenId != null)
 			{
 				// Get the rent associated with the token

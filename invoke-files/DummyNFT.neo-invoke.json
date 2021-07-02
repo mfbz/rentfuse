@@ -12,5 +12,16 @@
     "args": [
       1
     ]
+  },
+  {
+    "contract": "DummyNFTContract",
+    "operation": "totalSupply"
+  },
+  {
+    "contract": "DummyNFTContract",
+    "operation": "ownerOf",
+    "args": [
+      1
+    ]
   }
 ]

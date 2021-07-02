@@ -17,7 +17,8 @@ namespace RentFuse.Models
 		public ByteString TokenId;
 		public UInt160 Owner;
 		public UInt160 Tenant;
-		public NFT NFT;
+		public UInt160 NFTScriptHash;
+		public ByteString NFTTokenId;
 		public BigInteger Price;
 		public BigInteger Balance; // The balance available to the rent as example for withdrawing (+ and -) 
 		public BigInteger Amount; // The amount of the rent paid (only +)

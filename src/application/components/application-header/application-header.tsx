@@ -2,12 +2,13 @@ import { Layout, Space } from 'antd';
 import React from 'react';
 import { useWallet } from '../../../wallet';
 import { ApplicationLogo } from '../application-logo';
+import { ApplicationAccountButton } from './components/application-account-button';
 import { ApplicationWalletButton } from './components/application-wallet-button';
 
 export const HEADER_HEIGHT = 80;
 
 export const ApplicationHeader = React.memo(function ApplicationHeader({}: {}) {
-	const { loadingSession, connectWallet, disconnectWallet } = useWallet();
+	const { walletAccount, loadingSession, connectWallet, disconnectWallet } = useWallet();
 
 	return (
 		<div>
@@ -17,7 +18,15 @@ export const ApplicationHeader = React.memo(function ApplicationHeader({}: {}) {
 						<ApplicationLogo />
 
 						<Space>
-							<ApplicationWalletButton loading={loadingSession} onClick={connectWallet} />
+							{walletAccount ? (
+								<>
+									<ApplicationAccountButton account={walletAccount} onDisconnect={disconnectWallet} />
+								</>
+							) : (
+								<>
+									<ApplicationWalletButton loading={loadingSession} onConnect={connectWallet} />
+								</>
+							)}
 						</Space>
 					</div>
 				</div>

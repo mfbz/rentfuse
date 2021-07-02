@@ -6,10 +6,10 @@ import { WalletIcon } from '../../../../common/icons/wallet-icon';
 
 export const ApplicationWalletButton = React.memo(function ApplicationWalletButton({
 	loading,
-	onClick,
+	onConnect,
 }: {
 	loading?: boolean;
-	onClick: () => void;
+	onConnect: () => void;
 }) {
 	const { isMobileAndBelow } = useResponsive();
 
@@ -22,10 +22,10 @@ export const ApplicationWalletButton = React.memo(function ApplicationWalletButt
 					shape={'circle'}
 					icon={<Icon component={WalletIcon} />}
 					loading={loading}
-					onClick={onClick}
+					onClick={onConnect}
 				/>
 			) : (
-				<Button type={'primary'} size={'large'} shape={'round'} loading={loading} onClick={onClick}>
+				<Button type={'primary'} size={'large'} shape={'round'} loading={loading} onClick={onConnect}>
 					{'Connect wallet'}
 				</Button>
 			)}

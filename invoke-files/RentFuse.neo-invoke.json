@@ -18,5 +18,20 @@
 		"contract": "GasToken",
 		"operation": "transfer",
 		"args": ["@bob", "#RentFuseContract", 2, [0, 1]]
+	},
+	{
+		"contract": "RentFuseContract",
+		"operation": "getRent",
+		"args": [1]
+	},
+	{
+		"contract": "RentFuseContract",
+		"operation": "getRentListAsOwner",
+		"args": ["@alice", 0]
+	},
+	{
+		"contract": "RentFuseContract",
+		"operation": "getRentList",
+		"args": [0]
 	}
 ]

@@ -85,6 +85,10 @@ namespace RentFuse
 			if (IsNFTListed(NFTScriptHash, NFTTokenId)) throw new Exception("The NFT is already listed");
 			// Check that the NFT has not been rented yet, a nft can only have 1 open rent
 			if (IsNFTRented(NFTScriptHash, NFTTokenId)) throw new Exception("The NFT is already rented");
+			// Check that price is valid
+			if (price <= 0) throw new Exception("Invalid price");
+			// Check that duration is valid, at least 1 day
+			if (duration < Rent.ONE_DAY_MS) throw new Exception("Invalid duration, minimum is 1 day");
 
 			// Create a token id that is token count plus 1
 			BigInteger tokenCount = TokenCount();

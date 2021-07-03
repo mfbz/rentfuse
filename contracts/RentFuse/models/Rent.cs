@@ -7,6 +7,8 @@ namespace RentFuse.Models
 {
 	public class Rent
 	{
+		public static ulong ONE_DAY_MS = 1000 * 60 * 60 * 24;
+
 		public enum StateType
 		{
 			Open,
@@ -61,8 +63,7 @@ namespace RentFuse.Models
 
 		private int GetDays(ulong durationMS)
 		{
-			ulong oneDayMS = 1000 * 60 * 60 * 24;
-			return (int)(durationMS / oneDayMS);
+			return (int)(durationMS / ONE_DAY_MS);
 		}
 	}
 }

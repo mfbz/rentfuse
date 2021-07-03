@@ -1,8 +1,26 @@
+import { Button } from 'antd';
 import Head from 'next/head';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { ApplicationPage } from '../application';
+import { ContractHelper } from '../wallet';
 
 export default function IndexPage({}: {}) {
+	const onGetRent = useCallback(() => {
+		const getRent = async () => {
+			await ContractHelper.getRent({ tokenId: '1' });
+		};
+
+		getRent();
+	}, []);
+
+	const onGetRentList = useCallback(() => {
+		const getRentList = async () => {
+			await ContractHelper.getRentList({});
+		};
+
+		getRentList();
+	}, []);
+
 	return (
 		<>
 			<Head>
@@ -10,7 +28,10 @@ export default function IndexPage({}: {}) {
 			</Head>
 
 			<ApplicationPage>
-				<div></div>
+				<div>
+					<Button onClick={onGetRent}>GET RENT</Button>
+					<Button onClick={onGetRentList}>GET RENT LIST</Button>
+				</div>
 
 				<style jsx>{``}</style>
 			</ApplicationPage>

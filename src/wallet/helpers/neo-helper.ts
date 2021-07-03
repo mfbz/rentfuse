@@ -1,7 +1,7 @@
 import { rpc } from '@cityofzion/neon-js';
 import { ContractParamJson } from '@cityofzion/neon-core/lib/sc';
 
-export class N3Helper {
+export class NEOHelper {
 	private readonly rpcAddress: string;
 	private readonly networkMagic: number;
 

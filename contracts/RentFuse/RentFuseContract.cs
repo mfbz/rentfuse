@@ -122,11 +122,11 @@ namespace RentFuse
 			BigInteger ownerTokenCount = (BigInteger)OwnerToTokenCount[rent.Owner];
 			ownerTokenCount += 1;
 			// Save the value in its storage map
-			OwnerToToken.Put(rent.Owner + ownerTokenCount, rent.TokenId);
+			OwnerToToken.Put(Helper.Concat((byte[])rent.Owner, ownerTokenCount.ToByteArray()), rent.TokenId);
 			OwnerToTokenCount.Put(rent.Owner, ownerTokenCount);
 
 			// Assign token to nft
-			NFTToToken.Put(rent.NFTScriptHash + rent.NFTTokenId, rent.TokenId);
+			NFTToToken.Put(Helper.Concat((byte[])rent.NFTScriptHash, rent.NFTTokenId), rent.TokenId);
 
 			// Fire event to notify that a token has been created
 			OnTokenCreated((ByteString)tokenCount, owner);
@@ -234,7 +234,7 @@ namespace RentFuse
 		public static bool IsNFTRented(UInt160 NFTScriptHash, ByteString NFTTokenId)
 		{
 			// Get the token id associated to input nft if any
-			ByteString tokenId = NFTToToken[NFTScriptHash + NFTTokenId];
+			ByteString tokenId = NFTToToken[Helper.Concat((byte[])NFTScriptHash, NFTTokenId)];
 			if (tokenId != null)
 			{
 				// Get the rent associated with the token
@@ -251,7 +251,7 @@ namespace RentFuse
 		public static bool IsNFTListed(UInt160 NFTScriptHash, ByteString NFTTokenId)
 		{
 			// Get the token id associated to input nft if any
-			ByteString tokenId = NFTToToken[NFTScriptHash + NFTTokenId];
+			ByteString tokenId = NFTToToken[Helper.Concat((byte[])NFTScriptHash, NFTTokenId)];
 			if (tokenId != null)
 			{
 				// Get the rent associated with the token
@@ -305,7 +305,7 @@ namespace RentFuse
 			for (BigInteger i = (fromIndex == 0) ? tokenCount : fromIndex; i > ((fromIndex - MAX_GET_COUNT > 0) ? (fromIndex - MAX_GET_COUNT) : 0); i--)
 			{
 				// Get the token id at index i
-				ByteString tokenId = OwnerToToken[owner + (ByteString)i];
+				ByteString tokenId = OwnerToToken[Helper.Concat((byte[])owner, i.ToByteArray())];
 				// Get token at id and add to rent list
 				rentList.Add((Rent)StdLib.Deserialize(TokenToRent[tokenId]));
 			}
@@ -328,7 +328,7 @@ namespace RentFuse
 			for (BigInteger i = (fromIndex == 0) ? tokenCount : fromIndex; i > ((fromIndex - MAX_GET_COUNT > 0) ? (fromIndex - MAX_GET_COUNT) : 0); i--)
 			{
 				// Get the token id at index i
-				ByteString tokenId = TenantToToken[tenant + (ByteString)i];
+				ByteString tokenId = TenantToToken[Helper.Concat((byte[])tenant, i.ToByteArray())];
 				// Get token at id and add to rent list
 				rentList.Add((Rent)StdLib.Deserialize(TokenToRent[tokenId]));
 			}
@@ -417,7 +417,7 @@ namespace RentFuse
 			BigInteger tenantTokenCount = (BigInteger)TenantToTokenCount[rent.Tenant];
 			tenantTokenCount += 1;
 			// Save the value in its storage map
-			TenantToToken.Put(rent.Tenant + tenantTokenCount, rent.TokenId);
+			TenantToToken.Put(Helper.Concat((byte[])rent.Tenant, tenantTokenCount.ToByteArray()), rent.TokenId);
 			TenantToTokenCount.Put(rent.Tenant, tenantTokenCount);
 
 			// Fire event to notify that a token has been created

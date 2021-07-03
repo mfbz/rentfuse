@@ -33,5 +33,20 @@
 		"contract": "RentFuseContract",
 		"operation": "getRentList",
 		"args": [0]
+	},
+	{
+		"contract": "RentFuseContract",
+		"operation": "getRentListAsTenant",
+		"args": ["@bob", ""]
+	},
+	{
+		"contract": "RentFuseContract",
+		"operation": "withdrawRent",
+		"args": [1]
+	},
+	{
+		"contract": "GasToken",
+		"operation": "transfer",
+		"args": ["@bob", "#RentFuseContract", 3, [1, 1]]
 	}
 ]

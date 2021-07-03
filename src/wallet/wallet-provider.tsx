@@ -1,22 +1,22 @@
 import { WalletConnectContextProvider } from '@cityofzion/wallet-connect-sdk-react';
 import React, { useMemo } from 'react';
+import {
+	DEFAULT_APP_METADATA,
+	DEFAULT_CHAIN_ID,
+	DEFAULT_LOGGER,
+	DEFAULT_METHODS,
+	DEFAULT_RELAY_PROVIDER,
+} from './constants/default';
 
 export const WalletProvider = React.memo(function WalletProvider({ children }: { children: React.ReactNode }) {
 	// Wallet connect options
 	const wcOptions = useMemo(
 		() => ({
-			appMetadata: {
-				name: 'RentFuse',
-				description: 'Peer to peer renting of Neo N3 NFTs',
-				url: 'https://rentfuse.vercel.app/',
-				icons: [
-					'https://raw.githubusercontent.com/mfbz/rentfuse/4a256a86a5498e7aed0f12cbd32f36eec60f4188/rentfuse_icon.svg',
-				],
-			},
-			chainId: 'neo3:testnet',
-			logger: 'debug',
-			methods: ['invokefunction'],
-			relayServer: 'wss://connect.coz.io:443',
+			appMetadata: DEFAULT_APP_METADATA,
+			chainId: DEFAULT_CHAIN_ID,
+			logger: DEFAULT_LOGGER,
+			methods: DEFAULT_METHODS,
+			relayServer: DEFAULT_RELAY_PROVIDER,
 		}),
 		[],
 	);

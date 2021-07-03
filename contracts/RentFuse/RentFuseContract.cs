@@ -295,7 +295,7 @@ namespace RentFuse
 		{
 			ValidateAddress(owner);
 
-			BigInteger tokenCount = (BigInteger)OwnerToTokenCount[(ByteString)owner];
+			BigInteger tokenCount = (BigInteger)OwnerToTokenCount[owner];
 			// Check that fromIndex is valid
 			if (fromIndex < 0 || fromIndex > tokenCount) throw new Exception("Invalid starting index");
 
@@ -305,7 +305,7 @@ namespace RentFuse
 			for (BigInteger i = (fromIndex == 0) ? tokenCount : fromIndex; i > ((fromIndex - MAX_GET_COUNT > 0) ? (fromIndex - MAX_GET_COUNT) : 0); i--)
 			{
 				// Get the token id at index i
-				ByteString tokenId = OwnerToToken[(ByteString)i];
+				ByteString tokenId = OwnerToToken[owner + (ByteString)i];
 				// Get token at id and add to rent list
 				rentList.Add((Rent)StdLib.Deserialize(TokenToRent[tokenId]));
 			}
@@ -318,7 +318,7 @@ namespace RentFuse
 		{
 			ValidateAddress(tenant);
 
-			BigInteger tokenCount = (BigInteger)TenantToTokenCount[(ByteString)tenant];
+			BigInteger tokenCount = (BigInteger)TenantToTokenCount[tenant];
 			// Check that fromIndex is valid
 			if (fromIndex < 0 || fromIndex > tokenCount) throw new Exception("Invalid starting index");
 
@@ -328,7 +328,7 @@ namespace RentFuse
 			for (BigInteger i = (fromIndex == 0) ? tokenCount : fromIndex; i > ((fromIndex - MAX_GET_COUNT > 0) ? (fromIndex - MAX_GET_COUNT) : 0); i--)
 			{
 				// Get the token id at index i
-				ByteString tokenId = TenantToToken[(ByteString)i];
+				ByteString tokenId = TenantToToken[tenant + (ByteString)i];
 				// Get token at id and add to rent list
 				rentList.Add((Rent)StdLib.Deserialize(TokenToRent[tokenId]));
 			}

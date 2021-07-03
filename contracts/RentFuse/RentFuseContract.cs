@@ -230,7 +230,7 @@ namespace RentFuse
 		public static bool IsNFTRented(UInt160 NFTScriptHash, ByteString NFTTokenId)
 		{
 			// Get the token id associated to input nft if any
-			ByteString tokenId = NFTToToken[(ByteString)NFTScriptHash + NFTTokenId];
+			ByteString tokenId = NFTToToken[NFTScriptHash + NFTTokenId];
 			if (tokenId != null)
 			{
 				// Get the rent associated with the token
@@ -247,7 +247,7 @@ namespace RentFuse
 		public static bool IsNFTListed(UInt160 NFTScriptHash, ByteString NFTTokenId)
 		{
 			// Get the token id associated to input nft if any
-			ByteString tokenId = NFTToToken[(ByteString)NFTScriptHash + NFTTokenId];
+			ByteString tokenId = NFTToToken[NFTScriptHash + NFTTokenId];
 			if (tokenId != null)
 			{
 				// Get the rent associated with the token

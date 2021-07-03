@@ -3,5 +3,20 @@
 		"contract": "RentFuseContract",
 		"operation": "createToken",
 		"args": ["#DummyNFTContract", 1, 1, 2]
+	},
+	{
+		"contract": "RentFuseContract",
+		"operation": "isNFTRented",
+		"args": ["#DummyNFTContract", 1]
+	},
+	{
+		"contract": "RentFuseContract",
+		"operation": "isNFTListed",
+		"args": ["#DummyNFTContract", 1]
+	},
+	{
+		"contract": "GasToken",
+		"operation": "transfer",
+		"args": ["@bob", "#RentFuseContract", 2, [0, 1]]
 	}
 ]

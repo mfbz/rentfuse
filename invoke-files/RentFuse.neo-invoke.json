@@ -1,0 +1,7 @@
+[
+	{
+		"contract": "RentFuseContract",
+		"operation": "createToken",
+		"args": ["#DummyNFTContract", 1, 1, 2]
+	}
+]

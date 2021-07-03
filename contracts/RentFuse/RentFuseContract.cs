@@ -15,6 +15,7 @@ namespace RentFuse
 	[ManifestExtra("Name", "RentFuseContract")]
 	[ManifestExtra("Description", "Peer to peer renting of Neo N3 NFTs")]
 	[ManifestExtra("Version", "1.0.0")]
+	[ContractPermission("*", "*")]
 	public class RentFuseContract : SmartContract
 	{
 		private const int MAX_GET_COUNT = 100;

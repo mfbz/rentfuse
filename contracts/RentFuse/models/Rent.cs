@@ -7,7 +7,7 @@ namespace RentFuse.Models
 {
 	public class Rent
 	{
-		public static ulong ONE_DAY_MS = 1000 * 60 * 60 * 24;
+		public const ulong ONE_DAY_MS = 1000 * 60 * 60 * 24;
 
 		public enum StateType
 		{

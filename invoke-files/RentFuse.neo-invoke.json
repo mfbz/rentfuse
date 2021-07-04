@@ -2,7 +2,7 @@
 	{
 		"contract": "RentFuseContract",
 		"operation": "createToken",
-		"args": ["#DummyNFTContract", 1, 1, 172800000]
+		"args": ["#DummyNFTContract", 1, 2, 172800000]
 	},
 	{
 		"contract": "RentFuseContract",

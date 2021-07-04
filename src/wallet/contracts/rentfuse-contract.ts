@@ -17,9 +17,8 @@ export class RentFuseContract {
 
 		// Invoke the contract to perform a read (NB: Methods are always camel case and string are passed as integers! :O)
 		const result = await contract.testInvoke('getRent', [sc.ContractParam.integer(tokenId)]);
-
-		console.log(result);
-		console.log(RentFuseContract.parseRent(result.stack[0]));
+		// Parse rent into a rent object
+		return RentFuseContract.parseRent(result.stack[0]);
 	};
 
 	static getRentList = async ({ fromIndex }: { fromIndex?: number }) => {
@@ -31,7 +30,18 @@ export class RentFuseContract {
 			sc.ContractParam.integer(fromIndex !== undefined ? fromIndex : 0),
 		]);
 
-		console.log(result);
+		// Parse rent objects from returned stack
+		const rentList = [];
+		if (Array.isArray(result.stack[0].value)) {
+			for (const item of result.stack[0].value) {
+				const rent = RentFuseContract.parseRent(item);
+				if (rent !== null) {
+					rentList.push(rent);
+				}
+			}
+		}
+
+		return rentList;
 	};
 
 	// Accept a stack item to get a rent object from it

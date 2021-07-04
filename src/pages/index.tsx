@@ -7,7 +7,9 @@ import { RentFuseContract } from '../wallet';
 export default function IndexPage({}: {}) {
 	const onGetRent = useCallback(() => {
 		const getRent = async () => {
-			await RentFuseContract.getRent({ tokenId: '1' });
+			const rent = await RentFuseContract.getRent({ tokenId: '1' });
+
+			console.log(rent);
 		};
 
 		getRent();
@@ -15,7 +17,9 @@ export default function IndexPage({}: {}) {
 
 	const onGetRentList = useCallback(() => {
 		const getRentList = async () => {
-			await RentFuseContract.getRentList({});
+			const rentList = await RentFuseContract.getRentList({});
+
+			console.log(rentList);
 		};
 
 		getRentList();

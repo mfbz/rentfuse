@@ -1,4 +1,4 @@
-import Neon, { sc } from '@cityofzion/neon-js';
+import Neon, { sc, wallet, u } from '@cityofzion/neon-js';
 import { DEFAULT_SC_SCRIPTHASH, DEFAULT_NEO_NETWORK_MAGIC, DEFAULT_NEO_RPC_ADDRESS } from '../constants/default';
 import * as buffer from 'buffer';
 
@@ -14,7 +14,12 @@ export class ContractHelper {
 		const result = await contract.testInvoke('getRent', [sc.ContractParam.integer(tokenId)]);
 
 		console.log(result);
-		console.log(Neon.u.hexstring2str(buffer.Buffer.from('AQ==', 'base64').toString('hex')));
+		console.log(buffer.Buffer.from('AQ==', 'base64').toString('hex'));
+		console.log(
+			wallet.getAddressFromScriptHash(
+				u.reverseHex(buffer.Buffer.from('FMJ1sURDCm4zeyhL8gsYCNYsh1Q=', 'base64').toString('hex')),
+			),
+		);
 	};
 
 	static getRentList = async ({ fromIndex }: { fromIndex?: number }) => {

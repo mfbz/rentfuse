@@ -2,12 +2,12 @@ import { Button } from 'antd';
 import Head from 'next/head';
 import React, { useCallback } from 'react';
 import { ApplicationPage } from '../application';
-import { ContractHelper } from '../wallet';
+import { RentFuseContract } from '../wallet';
 
 export default function IndexPage({}: {}) {
 	const onGetRent = useCallback(() => {
 		const getRent = async () => {
-			await ContractHelper.getRent({ tokenId: '1' });
+			await RentFuseContract.getRent({ tokenId: '1' });
 		};
 
 		getRent();
@@ -15,7 +15,7 @@ export default function IndexPage({}: {}) {
 
 	const onGetRentList = useCallback(() => {
 		const getRentList = async () => {
-			await ContractHelper.getRentList({});
+			await RentFuseContract.getRentList({});
 		};
 
 		getRentList();

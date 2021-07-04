@@ -1,5 +1,3 @@
-import { NFT } from './nft';
-
 export enum StateType {
 	Open,
 	Rented,
@@ -9,8 +7,9 @@ export enum StateType {
 export interface Rent {
 	tokenId: string;
 	owner: string;
-	tenant: string;
-	nft: NFT;
+	tenant: string | null;
+	nftScriptHash: string;
+	nftTokenId: string;
 	price: number;
 	balance: number;
 	amount: number;

@@ -1,4 +1,4 @@
-import { Button } from 'antd';
+import { Button, Space } from 'antd';
 import Head from 'next/head';
 import React, { useCallback } from 'react';
 import { ApplicationPage } from '../application';
@@ -25,6 +25,26 @@ export default function IndexPage({}: {}) {
 		getRentList();
 	}, []);
 
+	const onGetRentListAsOwner = useCallback(() => {
+		const getRentListAsOwner = async () => {
+			const rentList = await RentFuseContract.getRentListAsOwner({ address: 'NMojetgaoRD74h9fRb3T8Yd5DEfCdxx7pD' });
+
+			console.log(rentList);
+		};
+
+		getRentListAsOwner();
+	}, []);
+
+	const onGetRentListAsTenant = useCallback(() => {
+		const getRentListAsTenant = async () => {
+			const rentList = await RentFuseContract.getRentListAsTenant({ address: 'NWEcD5bRPmF1vywSWDYpf7XmDC8ArYyNLb' });
+
+			console.log(rentList);
+		};
+
+		getRentListAsTenant();
+	}, []);
+
 	return (
 		<>
 			<Head>
@@ -33,8 +53,12 @@ export default function IndexPage({}: {}) {
 
 			<ApplicationPage>
 				<div>
-					<Button onClick={onGetRent}>GET RENT</Button>
-					<Button onClick={onGetRentList}>GET RENT LIST</Button>
+					<Space direction="vertical">
+						<Button onClick={onGetRent}>GET RENT</Button>
+						<Button onClick={onGetRentList}>GET RENT LIST</Button>
+						<Button onClick={onGetRentListAsOwner}>GET RENT LIST AS OWNER</Button>
+						<Button onClick={onGetRentListAsTenant}>GET RENT LIST AS TENANT</Button>
+					</Space>
 				</div>
 
 				<style jsx>{``}</style>

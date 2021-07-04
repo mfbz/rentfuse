@@ -31,17 +31,35 @@ export class RentFuseContract {
 		]);
 
 		// Parse rent objects from returned stack
-		const rentList = [];
-		if (Array.isArray(result.stack[0].value)) {
-			for (const item of result.stack[0].value) {
-				const rent = RentFuseContract.parseRent(item);
-				if (rent !== null) {
-					rentList.push(rent);
-				}
-			}
-		}
+		return RentFuseContract.parseRentList(result.stack[0]);
+	};
 
-		return rentList;
+	static getRentListAsOwner = async ({ address, fromIndex }: { address: string; fromIndex?: number }) => {
+		// The contract object i'll call by using this
+		const contract = RentFuseContract.getContract();
+
+		// Invoke the contract to perform a read
+		const result = await contract.testInvoke('getRentListAsOwner', [
+			sc.ContractParam.hash160(address),
+			sc.ContractParam.integer(fromIndex !== undefined ? fromIndex : 0),
+		]);
+
+		// Parse rent objects from returned stack
+		return RentFuseContract.parseRentList(result.stack[0]);
+	};
+
+	static getRentListAsTenant = async ({ address, fromIndex }: { address: string; fromIndex?: number }) => {
+		// The contract object i'll call by using this
+		const contract = RentFuseContract.getContract();
+
+		// Invoke the contract to perform a read
+		const result = await contract.testInvoke('getRentListAsTenant', [
+			sc.ContractParam.hash160(address),
+			sc.ContractParam.integer(fromIndex !== undefined ? fromIndex : 0),
+		]);
+
+		// Parse rent objects from returned stack
+		return RentFuseContract.parseRentList(result.stack[0]);
 	};
 
 	// Accept a stack item to get a rent object from it
@@ -75,5 +93,20 @@ export class RentFuseContract {
 			} as Rent;
 		}
 		return null;
+	};
+
+	private static parseRentList = (item: { type: any; value?: any }) => {
+		const rentList = [];
+
+		if (Array.isArray(item.value)) {
+			for (const element of item.value) {
+				const rent = RentFuseContract.parseRent(element);
+				if (rent !== null) {
+					rentList.push(rent);
+				}
+			}
+		}
+
+		return rentList;
 	};
 }

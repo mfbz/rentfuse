@@ -1,5 +1,6 @@
 import Neon, { sc } from '@cityofzion/neon-js';
 import { DEFAULT_SC_SCRIPTHASH, DEFAULT_NEO_NETWORK_MAGIC, DEFAULT_NEO_RPC_ADDRESS } from '../constants/default';
+import * as buffer from 'buffer';
 
 export class ContractHelper {
 	static getRent = async ({ tokenId }: { tokenId: string }) => {
@@ -13,6 +14,7 @@ export class ContractHelper {
 		const result = await contract.testInvoke('getRent', [sc.ContractParam.integer(tokenId)]);
 
 		console.log(result);
+		console.log(Neon.u.hexstring2str(buffer.Buffer.from('AQ==', 'base64').toString('hex')));
 	};
 
 	static getRentList = async ({ fromIndex }: { fromIndex?: number }) => {

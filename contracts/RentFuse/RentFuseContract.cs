@@ -265,18 +265,16 @@ namespace RentFuse
 		}
 
 
-		public static string GetRent(ByteString tokenId)
+		public static Rent GetRent(ByteString tokenId)
 		{
 			ValidateToken(tokenId);
 			Rent rent = (Rent)StdLib.Deserialize(TokenToRent[tokenId]);
 
-			// Return it as JSON string for easier data access
-			var result = new object[] { rent };
-			return StdLib.JsonSerialize(result);
+			return rent;
 		}
 
 		// Get a rent list in descending order from index (inclusive) or last one if passed 0 (default for BigInteger)
-		public static string GetRentList(BigInteger fromIndex)
+		public static List<Rent> GetRentList(BigInteger fromIndex)
 		{
 			BigInteger tokenCount = TokenCount();
 			// Check that fromIndex is valid
@@ -290,13 +288,11 @@ namespace RentFuse
 				rentList.Add((Rent)StdLib.Deserialize(TokenToRent[(ByteString)i]));
 			}
 
-			// Return it as JSON string for easier data access
-			var result = new object[] { rentList };
-			return StdLib.JsonSerialize(result);
+			return rentList;
 		}
 
 		// Get rent list as owner of rent token with pagination through fromIndex arg
-		public static string GetRentListAsOwner(UInt160 owner, BigInteger fromIndex)
+		public static List<Rent> GetRentListAsOwner(UInt160 owner, BigInteger fromIndex)
 		{
 			ValidateAddress(owner);
 
@@ -315,13 +311,11 @@ namespace RentFuse
 				rentList.Add((Rent)StdLib.Deserialize(TokenToRent[tokenId]));
 			}
 
-			// Return it as JSON string for easier data access
-			var result = new object[] { rentList };
-			return StdLib.JsonSerialize(result);
+			return rentList;
 		}
 
 		// Get rent list as tenant of rent token with pagination through fromIndex arg
-		public static string GetRentListAsTenant(UInt160 tenant, BigInteger fromIndex)
+		public static List<Rent> GetRentListAsTenant(UInt160 tenant, BigInteger fromIndex)
 		{
 			ValidateAddress(tenant);
 
@@ -340,9 +334,7 @@ namespace RentFuse
 				rentList.Add((Rent)StdLib.Deserialize(TokenToRent[tokenId]));
 			}
 
-			// Return it as JSON string for easier data access
-			var result = new object[] { rentList };
-			return StdLib.JsonSerialize(result);
+			return rentList;
 		}
 
 		[DisplayName("_deploy")]

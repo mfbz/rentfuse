@@ -1,7 +1,7 @@
 import yargs from 'yargs/yargs';
 import path from 'path';
 import fs from 'fs';
-import { sc } from '@cityofzion/neon-js';
+import { sc, wallet } from '@cityofzion/neon-js';
 import { deployContract } from './neon-experimental';
 
 // Folders access utils
@@ -26,24 +26,16 @@ console.log(argv.password);
 // Execute the command asynchronously
 (async () => {
 	// Get wallet accounts from json
-	const wallet = WALLET_JSON;
-	const walletAccounts = wallet.accounts;
-	if (!walletAccounts.length) {
-		return;
-	}
+	const walletAccounts = WALLET_JSON.accounts;
 
 	// Get the account from the wallets (Take first one as default)
-	let account = walletAccounts[0];
+	const account = new wallet.Account(walletAccounts[0].key);
 	// Decrypt it with argument password
 	try {
-		await account.decrypt('');
+		await account.decrypt(argv.password || '');
 	} catch (e) {
-		try {
-			await account.decrypt(argv.password);
-		} catch (e) {
-			console.error('Incorrect password');
-			return;
-		}
+		console.error('Incorrect password');
+		return;
 	}
 
 	// Contract to deploy buffer

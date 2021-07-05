@@ -63,6 +63,7 @@ export class RentFuseContract {
 	};
 
 	// Accept a stack item to get a rent object from it
+	// TODO SAVEEEEEEEE AND APPLY THE CHANGES TO RENTFUSE PARSE
 	private static parseRent = (item: { type: any; value?: any }) => {
 		if (Array.isArray(item.value) && item.value.length == 13) {
 			return {

@@ -6,7 +6,8 @@
 		"web:build": "next build",
 		"web:start": "next start",
 		"cli:deploy": "ts-node ./cli/deploy.ts",
-		"cli:invoke": "ts-node ./cli/invoke.ts"
+		"cli:publish-invoke": "ts-node ./cli/publish-invoke.ts",
+		"cli:test-invoke": "ts-node ./cli/test-invoke.ts"
 	},
 	"dependencies": {
 		"@ant-design/icons": "^4.6.2",

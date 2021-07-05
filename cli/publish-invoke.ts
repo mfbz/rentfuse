@@ -1,5 +1,5 @@
 import { Account } from '@cityofzion/neon-core/lib/wallet';
-import Neon, { wallet } from '@cityofzion/neon-js';
+import Neon, { sc, wallet } from '@cityofzion/neon-js';
 import fs from 'fs';
 import path from 'path';
 import yargs from 'yargs/yargs';
@@ -67,12 +67,14 @@ const publishInvoke = async (
 			SC_SCRIPTHASH,
 			'mint',
 			[
-				`{"name”:”Rolling”,”description”:”The concept of motion expressed by moving objects.”,”image":"https://media.giphy.com/media/l2RnD5T2Aq0HWRfhe/giphy.gif"}`,
+				sc.ContractParam.string(
+					'{"name":"Slime","description":"A slime","image":"https://static.wikia.nocookie.net/dragonquest/images/6/60/Slime_Artwork.png/revision/latest/scale-to-width-down/1000?cb=20201021141416"}',
+				),
 			],
 			account,
 		);
 
-		console.log('Contract correctly invoken with {{TXID}} (A reference transaction ID):');
+		console.log('Contract correctly publish invoked with {{TXID}} (A reference transaction ID):');
 		console.log(result);
 	} catch (e) {
 		console.error(e.message || 'An error occurred while invoking the contract');

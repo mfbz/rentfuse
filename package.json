@@ -5,7 +5,8 @@
 		"web:dev": "next",
 		"web:build": "next build",
 		"web:start": "next start",
-		"cli:deploy": "ts-node ./cli/deploy.ts"
+		"cli:deploy": "ts-node ./cli/deploy.ts",
+		"cli:invoke": "ts-node ./cli/invoke.ts"
 	},
 	"dependencies": {
 		"@ant-design/icons": "^4.6.2",

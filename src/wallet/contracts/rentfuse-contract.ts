@@ -1,21 +1,19 @@
-import Neon, { sc, wallet, u } from '@cityofzion/neon-js';
-import { DEFAULT_SC_SCRIPTHASH, DEFAULT_NEO_NETWORK_MAGIC, DEFAULT_NEO_RPC_ADDRESS } from '../constants/default';
-import * as buffer from 'buffer';
+import Neon, { sc, u, wallet } from '@cityofzion/neon-js';
+import {
+	DEFAULT_GAS_PRECISION,
+	DEFAULT_NEO_NETWORK_MAGIC,
+	DEFAULT_NEO_RPC_ADDRESS,
+	DEFAULT_SC_SCRIPTHASH,
+} from '../constants/default';
+import { NEOHelper } from '../helpers/neo-helper';
 import { Rent } from '../interfaces/rent';
 
 export class RentFuseContract {
-	static getContract = () => {
-		return new Neon.experimental.SmartContract(Neon.u.HexString.fromHex(DEFAULT_SC_SCRIPTHASH), {
-			networkMagic: DEFAULT_NEO_NETWORK_MAGIC,
-			rpcAddress: DEFAULT_NEO_RPC_ADDRESS,
-		});
-	};
-
 	static getRent = async ({ tokenId }: { tokenId: string }) => {
 		// The contract object i'll call by using this
 		const contract = RentFuseContract.getContract();
 
-		// Invoke the contract to perform a read (NB: Methods are always camel case and string are passed as integers! :O)
+		// Invoke the contract to perform a read (NB: Methods are always camel case and bytestrings are passed as integers! :O)
 		const result = await contract.testInvoke('getRent', [sc.ContractParam.integer(tokenId)]);
 		// Parse rent into a rent object
 		return RentFuseContract.parseRent(result.stack[0]);
@@ -60,6 +58,53 @@ export class RentFuseContract {
 
 		// Parse rent objects from returned stack
 		return RentFuseContract.parseRentList(result.stack[0]);
+	};
+
+	// price absolute, it's later added gas precision, duration in ms
+	static createToken = async ({
+		nftScriptHash,
+		nftTokenId,
+		price,
+		duration,
+		walletContext,
+	}: {
+		nftScriptHash: string;
+		nftTokenId: string;
+		price: number;
+		duration: number;
+		walletContext: any;
+	}) => {
+		// UInt160 NFTScriptHash, ByteString NFTTokenId, BigInteger price, ulong duration
+		const response = await walletContext.invokeFunction(DEFAULT_SC_SCRIPTHASH, 'createToken', [
+			{ type: 'Address', value: nftScriptHash },
+			{ type: 'String', value: nftTokenId },
+			{ type: 'Integer', value: Math.ceil(Number(price) * DEFAULT_GAS_PRECISION) },
+			{ type: 'Integer', value: duration },
+		]);
+
+		console.log(response);
+
+		// If error thrown an exception
+		if (response.result.error && response.result.error.message) {
+			throw new Error('An error occurred invoking contract function');
+		}
+
+		// Get txId from response to know wheter it finished processing it
+		const txId = response.result as string;
+		// Search the txId notification with my contract has and correct event
+		const notification = (await NEOHelper.getNotificationsFromTxId(txId)).find(
+			(n: any) => n.contract === DEFAULT_SC_SCRIPTHASH && n.eventname === 'TokenCreated',
+		);
+
+		// If notification is found everything is good!
+		return notification !== undefined;
+	};
+
+	private static getContract = () => {
+		return new Neon.experimental.SmartContract(Neon.u.HexString.fromHex(DEFAULT_SC_SCRIPTHASH), {
+			networkMagic: DEFAULT_NEO_NETWORK_MAGIC,
+			rpcAddress: DEFAULT_NEO_RPC_ADDRESS,
+		});
 	};
 
 	// Accept a stack item to get a rent object from it

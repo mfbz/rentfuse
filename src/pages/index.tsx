@@ -2,9 +2,11 @@ import { Button, Space } from 'antd';
 import Head from 'next/head';
 import React, { useCallback } from 'react';
 import { ApplicationPage } from '../application';
-import { RentFuseContract } from '../wallet';
+import { RentFuseContract, useWallet } from '../wallet';
 
 export default function IndexPage({}: {}) {
+	const { walletContext } = useWallet();
+
 	const onGetRent = useCallback(() => {
 		const getRent = async () => {
 			const rent = await RentFuseContract.getRent({ tokenId: '1' });
@@ -45,6 +47,22 @@ export default function IndexPage({}: {}) {
 		getRentListAsTenant();
 	}, []);
 
+	const onCreateToken = useCallback(() => {
+		const getRentListAsTenant = async () => {
+			const result = await RentFuseContract.createToken({
+				nftScriptHash: '0xe91c69379c44bd6abe15c52b52549d6aaa0ea3d9',
+				nftTokenId: '6',
+				price: 2,
+				duration: 1000 * 60 * 60 * 24, // one day in ms
+				walletContext,
+			});
+
+			console.log(result);
+		};
+
+		getRentListAsTenant();
+	}, [walletContext]);
+
 	return (
 		<>
 			<Head>
@@ -58,6 +76,10 @@ export default function IndexPage({}: {}) {
 						<Button onClick={onGetRentList}>GET RENT LIST</Button>
 						<Button onClick={onGetRentListAsOwner}>GET RENT LIST AS OWNER</Button>
 						<Button onClick={onGetRentListAsTenant}>GET RENT LIST AS TENANT</Button>
+
+						<Button danger={true} onClick={onCreateToken}>
+							CREATE TOKEN
+						</Button>
 					</Space>
 				</div>
 

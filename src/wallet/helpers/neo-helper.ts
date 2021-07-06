@@ -1,42 +1,38 @@
 import { rpc } from '@cityofzion/neon-js';
-import { ContractParamJson } from '@cityofzion/neon-core/lib/sc';
+import { DEFAULT_NEO_RPC_ADDRESS } from '../constants/default';
 
 export class NEOHelper {
-	private readonly rpcAddress: string;
-	private readonly networkMagic: number;
+	private static readonly READ_LOG_FREQUENCY = 1000; //ms
 
-	constructor(rpcAddress: string, networkMagic: number) {
-		this.rpcAddress = rpcAddress;
-		this.networkMagic = networkMagic;
-	}
+	static getNotificationsFromTxId = async (txId: string) => {
+		// Get rpc client to do calls
+		const rpcClient = NEOHelper.getRPCClient();
 
-	getNotificationsFromTxId = async (txId: string) => {
-		const rpcClient = new rpc.RPCClient(this.rpcAddress);
-
+		// Cycle until i get app log to extract notifications from
 		let appLog;
 		do {
 			try {
 				appLog = await rpcClient.getApplicationLog(txId);
 			} catch (e) {
-				await this.sleep(5000);
+				await NEOHelper.sleep(NEOHelper.READ_LOG_FREQUENCY);
 			}
 		} while (!appLog);
 
-		const allNotifications: {
-			contract: string;
-			eventname: string;
-			state: ContractParamJson;
-		}[] = [];
+		// Get notifications from app log and return them
+		const notifications = [] as any;
 		appLog.executions.forEach((e) => {
-			allNotifications.push(...e.notifications);
+			notifications.push(...e.notifications);
 		});
-
-		return allNotifications;
+		return notifications;
 	};
 
-	private sleep = (time: number) => {
+	private static getRPCClient = () => {
+		return new rpc.RPCClient(DEFAULT_NEO_RPC_ADDRESS);
+	};
+
+	private static sleep = (duration: number) => {
 		return new Promise((resolve) => {
-			setTimeout(resolve, time);
+			setTimeout(resolve, duration);
 		});
 	};
 }

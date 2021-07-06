@@ -7,6 +7,7 @@ import {
 } from '../constants/default';
 import { NEOHelper } from '../helpers/neo-helper';
 import { Rent } from '../interfaces/rent';
+import * as buffer from 'buffer';
 
 export class RentFuseContract {
 	static getRent = async ({ tokenId }: { tokenId: string }) => {
@@ -77,7 +78,7 @@ export class RentFuseContract {
 		// UInt160 NFTScriptHash, ByteString NFTTokenId, BigInteger price, ulong duration
 		const response = await walletContext.invokeFunction(DEFAULT_SC_SCRIPTHASH, 'createToken', [
 			{ type: 'Address', value: nftScriptHash },
-			{ type: 'String', value: nftTokenId },
+			{ type: 'Integer', value: nftTokenId },
 			{ type: 'Integer', value: Math.ceil(Number(price) * DEFAULT_GAS_PRECISION) },
 			{ type: 'Integer', value: duration },
 		]);
@@ -111,17 +112,21 @@ export class RentFuseContract {
 	private static parseRent = (item: { type: any; value?: any }) => {
 		if (Array.isArray(item.value) && item.value.length == 13) {
 			return {
-				tokenId: u.HexString.fromBase64(item.value[0].value).toAscii(),
-				owner: wallet.getAddressFromScriptHash(u.reverseHex(u.HexString.fromBase64(item.value[1].value) as any)),
+				tokenId: buffer.Buffer.from(item.value[0].value, 'base64').toString('hex'),
+				owner: wallet.getAddressFromScriptHash(
+					u.reverseHex(buffer.Buffer.from(item.value[1].value, 'base64').toString('hex')),
+				),
 				tenant: item.value[2].value
-					? wallet.getAddressFromScriptHash(u.reverseHex(u.HexString.fromBase64(item.value[2].value) as any))
+					? wallet.getAddressFromScriptHash(
+							u.reverseHex(buffer.Buffer.from(item.value[2].value, 'base64').toString('hex')),
+					  )
 					: null,
 				nftScriptHash: wallet.getAddressFromScriptHash(
-					u.reverseHex(u.HexString.fromBase64(item.value[3].value) as any),
+					u.reverseHex(buffer.Buffer.from(item.value[3].value, 'base64').toString('hex')),
 				),
 				nftTokenId:
 					item.value[4].type === 'ByteString'
-						? u.HexString.fromBase64(item.value[4].value).toAscii()
+						? buffer.Buffer.from(item.value[4].value, 'base64').toString('hex')
 						: item.value[4].value,
 				price: +item.value[5].value,
 				balance: +item.value[6].value,

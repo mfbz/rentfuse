@@ -68,7 +68,7 @@ const publishInvoke = async (
 			'mint',
 			[
 				sc.ContractParam.string(
-					'{"name":"Slime","description":"A slime","image":"https://static.wikia.nocookie.net/dragonquest/images/6/60/Slime_Artwork.png/revision/latest/scale-to-width-down/1000?cb=20201021141416"}',
+					'{"name”:”Rolling”,”description”:”The concept of motion expressed by moving objects.”,”image":"https://media.giphy.com/media/l2RnD5T2Aq0HWRfhe/giphy.gif"}',
 				),
 			],
 			account,

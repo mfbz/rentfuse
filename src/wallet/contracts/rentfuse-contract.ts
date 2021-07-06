@@ -63,25 +63,20 @@ export class RentFuseContract {
 	};
 
 	// Accept a stack item to get a rent object from it
-	// TODO SAVEEEEEEEE AND APPLY THE CHANGES TO RENTFUSE PARSE
 	private static parseRent = (item: { type: any; value?: any }) => {
 		if (Array.isArray(item.value) && item.value.length == 13) {
 			return {
-				tokenId: buffer.Buffer.from(item.value[0].value, 'base64').toString('hex'),
-				owner: wallet.getAddressFromScriptHash(
-					u.reverseHex(buffer.Buffer.from(item.value[1].value, 'base64').toString('hex')),
-				),
+				tokenId: u.HexString.fromBase64(item.value[0].value).toAscii(),
+				owner: wallet.getAddressFromScriptHash(u.reverseHex(u.HexString.fromBase64(item.value[1].value) as any)),
 				tenant: item.value[2].value
-					? wallet.getAddressFromScriptHash(
-							u.reverseHex(buffer.Buffer.from(item.value[2].value, 'base64').toString('hex')),
-					  )
+					? wallet.getAddressFromScriptHash(u.reverseHex(u.HexString.fromBase64(item.value[2].value) as any))
 					: null,
 				nftScriptHash: wallet.getAddressFromScriptHash(
-					u.reverseHex(buffer.Buffer.from(item.value[3].value, 'base64').toString('hex')),
+					u.reverseHex(u.HexString.fromBase64(item.value[3].value) as any),
 				),
 				nftTokenId:
 					item.value[4].type === 'ByteString'
-						? buffer.Buffer.from(item.value[4].value, 'base64').toString('hex')
+						? u.HexString.fromBase64(item.value[4].value).toAscii()
 						: item.value[4].value,
 				price: +item.value[5].value,
 				balance: +item.value[6].value,

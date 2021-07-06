@@ -44,7 +44,7 @@ const testInvoke = async (
 		console.log(result);
 
 		console.log('Parsed result:');
-		// NB: Parse the result as string // TODO SAVEEEEEEEE AND APPLY THE CHANGES TO RENTFUSE PARSE RENT
+		// NB: Parse the result as string
 		console.log(Neon.u.HexString.fromBase64(result.stack[0].value as string).toAscii());
 	} catch (e) {
 		console.error(e.message || 'An error occurred while invoking the contract');

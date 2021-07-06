@@ -37,7 +37,7 @@ const testInvoke = async (
 	try {
 		// Invoke a signed transaction
 		const result = await testInvoke(RPC_URL, NETWORK_MAGIC, SC_SCRIPTHASH, 'properties', [
-			sc.ContractParam.integer('4'),
+			sc.ContractParam.integer('6'),
 		]);
 
 		console.log('Contract correctly test invoked');

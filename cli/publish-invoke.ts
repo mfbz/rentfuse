@@ -68,7 +68,7 @@ const publishInvoke = async (
 			'mint',
 			[
 				sc.ContractParam.string(
-					'{"name”:”Rolling”,”description”:”The concept of motion expressed by moving objects.”,”image":"https://media.giphy.com/media/l2RnD5T2Aq0HWRfhe/giphy.gif"}',
+					'{"name":"Rolling","description":"The concept of motion expressed by moving objects.","image":"https://media.giphy.com/media/l2RnD5T2Aq0HWRfhe/giphy.gif"}',
 				),
 			],
 			account,

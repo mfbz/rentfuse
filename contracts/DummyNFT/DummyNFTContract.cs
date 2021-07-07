@@ -56,7 +56,6 @@ namespace DummyNFT
 		public static bool Transfer(UInt160 to, ByteString tokenId)
 		{
 			ValidateAddress(to);
-			ValidateToken((BigInteger)tokenId);
 
 			// Get the owner of the token and check that it's really it that is calling the contract
 			UInt160 from = (UInt160)TokenToOwner[tokenId];
@@ -79,7 +78,6 @@ namespace DummyNFT
 		[DisplayName("ownerOf")]
 		public static UInt160 OwnerOf(ByteString tokenId)
 		{
-			ValidateToken((BigInteger)tokenId);
 			return (UInt160)TokenToOwner[tokenId];
 		}
 
@@ -92,7 +90,6 @@ namespace DummyNFT
 		[DisplayName("properties")]
 		public static string Properties(ByteString tokenId)
 		{
-			ValidateToken((BigInteger)tokenId);
 			return TokenToProperties[tokenId];
 		}
 
@@ -147,12 +144,6 @@ namespace DummyNFT
 		{
 			if (address is null || !address.IsValid)
 				throw new Exception("The argument <address> is invalid");
-		}
-
-		private static void ValidateToken(BigInteger tokenId)
-		{
-			BigInteger tokenCount = TokenCount();
-			if (tokenId < 1 || tokenId > tokenCount) throw new Exception("Invalid token id");
 		}
 
 		private static void UpdateBalance(UInt160 address, ByteString tokenId, int increment)

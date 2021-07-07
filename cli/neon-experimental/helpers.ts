@@ -225,6 +225,48 @@ export async function deployContract(
 }
 
 /**
+ * Update a smart contract
+ * @param nef - A smart contract in Neo executable file format. Commonly created by a NEO compiler and stored as .NEF on disk
+ * @param manifest - the manifest corresponding to the smart contract
+ * @param config -
+ */
+export async function updateContract(
+	nef: sc.NEF,
+	manifest: sc.ContractManifest,
+	config: CommonConfig,
+): Promise<string> {
+	const builder = new sc.ScriptBuilder();
+	builder.emitContractCall({
+		scriptHash: CONST.NATIVE_CONTRACT_HASH.ManagementContract,
+		operation: 'update',
+		callFlags: sc.CallFlags.All,
+		args: [
+			sc.ContractParam.byteArray(u.HexString.fromHex(nef.serialize(), true)),
+			sc.ContractParam.string(JSON.stringify(manifest.toJson())),
+		],
+	});
+
+	const transaction = new tx.Transaction();
+	transaction.script = u.HexString.fromHex(builder.build());
+
+	await setBlockExpiry(transaction, config, config.blocksTillExpiry);
+
+	// add a sender
+	if (config.account === undefined) throw new Error('Account in your config cannot be undefined');
+
+	transaction.addSigner({
+		account: config.account.scriptHash,
+		scopes: 'CalledByEntry',
+	});
+
+	await addFees(transaction, config);
+
+	transaction.sign(config.account, config.networkMagic);
+	const rpcClient = new rpc.RPCClient(config.rpcAddress);
+	return await rpcClient.sendRawTransaction(transaction);
+}
+
+/**
  * Get the hash that identifies the contract on the chain matching the specified NEF
  * @param sender - The sender of the transaction
  * @param nefChecksum - The checksum of the Neo Executable File. A NEF file is a smart contract commonly created by a NEO compiler and stored as .NEF on disk

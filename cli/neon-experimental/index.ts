@@ -1,3 +1,3 @@
-import { deployContract } from './helpers';
+import { deployContract, updateContract } from './helpers';
 
-export { deployContract };
+export { deployContract, updateContract };

@@ -6,6 +6,7 @@
 		"web:build": "next build",
 		"web:start": "next start",
 		"cli:deploy": "ts-node ./cli/deploy.ts",
+		"cli:update": "ts-node ./cli/update.ts",
 		"cli:publish-invoke": "ts-node ./cli/publish-invoke.ts",
 		"cli:test-invoke": "ts-node ./cli/test-invoke.ts"
 	},

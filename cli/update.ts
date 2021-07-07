@@ -12,6 +12,7 @@ const CONTRACTS_DIR = path.join(BASE_DIR, 'contracts');
 // Variables to change for different update
 const RPC_URL = 'https://testnet1.neo.coz.io:443';
 const NETWORK_MAGIC = 844378958;
+const CONTRACT_SCRIPTHASH = '0xe91c69379c44bd6abe15c52b52549d6aaa0ea3d9';
 const CONTRACT_FILE_PATH = path.join(CONTRACTS_DIR, 'DummyNFT/bin/sc/DummyNFTContract.nef');
 const WALLET_JSON = JSON.parse(fs.readFileSync(path.join(WALLETS_DIR, 'TestNet-MFBZ.neo-wallet.json'), 'utf8'));
 const MANIFEST_JSON = JSON.parse(
@@ -62,7 +63,7 @@ console.log(argv.password);
 			throw Error('Could not update the contract as manifest was incomplete');
 		}
 		const manifest = sc.ContractManifest.fromJson(manifestJson);
-		const result = await updateContract(sc.NEF.fromBuffer(contractByteCode), manifest, {
+		const result = await updateContract(CONTRACT_SCRIPTHASH, sc.NEF.fromBuffer(contractByteCode), manifest, {
 			networkMagic: NETWORK_MAGIC,
 			rpcAddress: RPC_URL,
 			account,

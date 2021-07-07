@@ -231,13 +231,14 @@ export async function deployContract(
  * @param config -
  */
 export async function updateContract(
+	contractHash: string,
 	nef: sc.NEF,
 	manifest: sc.ContractManifest,
 	config: CommonConfig,
 ): Promise<string> {
 	const builder = new sc.ScriptBuilder();
 	builder.emitContractCall({
-		scriptHash: CONST.NATIVE_CONTRACT_HASH.ManagementContract,
+		scriptHash: contractHash,
 		operation: 'update',
 		callFlags: sc.CallFlags.All,
 		args: [

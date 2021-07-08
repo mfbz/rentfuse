@@ -12,11 +12,12 @@ const CONTRACTS_DIR = path.join(BASE_DIR, 'contracts');
 // Variables to change for different update
 const RPC_URL = 'https://testnet1.neo.coz.io:443';
 const NETWORK_MAGIC = 844378958;
-const CONTRACT_SCRIPTHASH = '0xe91c69379c44bd6abe15c52b52549d6aaa0ea3d9';
-const CONTRACT_FILE_PATH = path.join(CONTRACTS_DIR, 'DummyNFT/bin/sc/DummyNFTContract.nef');
+
+const CONTRACT_SCRIPTHASH = '0x74af22c6b7304251eeebfd12ec53f82a40495b50';
+const CONTRACT_FILE_PATH = path.join(CONTRACTS_DIR, 'RentFuse/bin/sc/RentFuseContract.nef');
 const WALLET_JSON = JSON.parse(fs.readFileSync(path.join(WALLETS_DIR, 'TestNet-MFBZ.neo-wallet.json'), 'utf8'));
 const MANIFEST_JSON = JSON.parse(
-	fs.readFileSync(path.join(CONTRACTS_DIR, 'DummyNFT/bin/sc/DummyNFTContract.manifest.json'), 'utf8'),
+	fs.readFileSync(path.join(CONTRACTS_DIR, 'RentFuse/bin/sc/RentFuseContract.manifest.json'), 'utf8'),
 );
 
 // To get command line arguments

@@ -27,6 +27,7 @@ export default function IndexPage({}: {}) {
 	}, []);
 
 	const onLoadNFT = useCallback(async () => {
+		// TODO: ADD CONTRACT CALL TO GET NFT
 		const rentList = await RentFuseContract.getRentList({});
 
 		return null;

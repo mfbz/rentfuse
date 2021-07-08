@@ -10,6 +10,7 @@ const themeVariables = lessToJS(fs.readFileSync(path.resolve(__dirname, './src/s
 
 module.exports = withCSS(
 	withLESS({
+		hmr: false,
 		lessLoaderOptions: {
 			javascriptEnabled: true,
 			modifyVars: themeVariables, // make antd custom effective

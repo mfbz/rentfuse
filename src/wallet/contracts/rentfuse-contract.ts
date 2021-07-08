@@ -246,9 +246,7 @@ export class RentFuseContract {
 							u.reverseHex(buffer.Buffer.from(item.value[2].value, 'base64').toString('hex')),
 					  )
 					: null,
-				nftScriptHash: wallet.getAddressFromScriptHash(
-					u.reverseHex(buffer.Buffer.from(item.value[3].value, 'base64').toString('hex')),
-				),
+				nftScriptHash: u.reverseHex(buffer.Buffer.from(item.value[3].value, 'base64').toString('hex')),
 				nftTokenId:
 					item.value[4].type === 'ByteString'
 						? buffer.Buffer.from(item.value[4].value, 'base64').toString('hex')

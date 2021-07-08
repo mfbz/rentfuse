@@ -5,6 +5,7 @@ import { ApplicationPage } from '../application';
 import { TokenGrid } from '../modules/token';
 import { Rent, RentFuseContract } from '../wallet';
 import { useRouter } from 'next/router';
+import { NEP11Contract } from '../wallet/contracts/nep11-contract';
 
 export default function IndexPage({}: {}) {
 	const router = useRouter();
@@ -26,9 +27,23 @@ export default function IndexPage({}: {}) {
 		loadRents();
 	}, []);
 
-	const onLoadNFT = useCallback(async () => {
-		// TODO: ADD CONTRACT CALL TO GET NFT
-		const rentList = await RentFuseContract.getRentList({});
+	const onLoadNFT = useCallback(async (nftScriptHash: string, nftTokenId: string) => {
+		try {
+			// Get needed data calling the contract
+			const symbol = await NEP11Contract.getSymbol({ scriptHash: nftScriptHash });
+			console.log(symbol);
+			const properties = await NEP11Contract.getProperties({ scriptHash: nftScriptHash, tokenId: nftTokenId });
+			console.log(properties);
+
+			return {
+				symbol,
+				scriptHash: nftScriptHash,
+				tokenId: nftTokenId,
+				properties,
+			};
+		} catch (error) {
+			message.error('An error occurred loading nft data.');
+		}
 
 		return null;
 	}, []);

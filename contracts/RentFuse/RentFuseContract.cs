@@ -40,18 +40,24 @@ namespace RentFuse
 
 		private static Transaction Tx => (Transaction)Runtime.ScriptContainer;
 
-		// Fires whenever a token is created (providing the token ID and the address of the owner)
+		// Fires whenever a token is created
 		[DisplayName("TokenCreated")]
 		public static event Action<ByteString, UInt160> OnTokenCreated;
-		// Fires whenever a token is rented (providing the token ID and the address of the tenant)
+		// Fires whenever a token is rented
 		[DisplayName("TokenRented")]
 		public static event Action<ByteString, UInt160> OnTokenRented;
-		// Fires whenever a token rent is paid (providing the token ID and the address of the tenant)
+		// Fires whenever a token rent is paid
 		[DisplayName("TokenPaid")]
 		public static event Action<ByteString, UInt160> OnTokenPaid;
-		// Fires whenever a token rent is closed (providing the token ID and the address of the owner)
+		// Fires whenever a token rent is closed
 		[DisplayName("TokenClosed")]
 		public static event Action<ByteString, UInt160> OnTokenClosed;
+		// Fires whenever a token rent is revoked
+		[DisplayName("TokenRevoked")]
+		public static event Action<ByteString, UInt160> OnTokenRevoked;
+		// Fires whenever a token rent is withdrawn
+		[DisplayName("TokenWithdrawn")]
+		public static event Action<ByteString, UInt160, BigInteger> OnTokenWithdrawn;
 
 		// data contains [action: Integer, tokenId: ByteString]
 		public static void OnNEP17Payment(UInt160 from, BigInteger amount, object[] data)
@@ -132,8 +138,8 @@ namespace RentFuse
 			OnTokenCreated((ByteString)tokenCount, owner);
 		}
 
-		// Withdraw available balance from token rent and close it if it's terminated
-		public static bool WithdrawRent(ByteString tokenId)
+		// Withdraw available balance from token rent
+		public static bool WithdrawToken(ByteString tokenId)
 		{
 			ValidateToken(tokenId);
 
@@ -150,36 +156,23 @@ namespace RentFuse
 			// Transfer the amount to rent owner and update rent balance to prevent further withdraw
 			if (GAS.Transfer(Runtime.ExecutingScriptHash, rent.Owner, withdrawableAmount))
 			{
-				// Variable indicating if the rent has been closed now to emit the correct event
-				bool hasClosed = false;
-
 				// Update balance decreasing it by withdrawn amount
 				rent.Balance = rent.Balance - withdrawableAmount;
-				// Check if the rent is finished and not already closed if so set it as closed
-				if (rent.IsFilled() && rent.IsFinished() && rent.State != Rent.StateType.Closed)
-				{
-					rent.State = Rent.StateType.Closed;
-					rent.ClosedOn = Runtime.Time;
-
-					hasClosed = true;
-				}
 
 				// Save updated rent
 				TokenToRent.Put(tokenId, StdLib.Serialize(rent));
-
-				// Emit closed event if rent has been closed with this withdraw operation
-				if (hasClosed) OnTokenClosed(tokenId, rent.Owner);
-
 				// Return true, everything went well
 				return true;
 			}
 
+			// Fire event to notify that a token has been withdrawn
+			OnTokenWithdrawn(tokenId, rent.Owner, withdrawableAmount);
 			// As default return that the withdraw doesn't went well
 			return false;
 		}
 
 		// Revoke the rent if the tenant doesn't pay and the rent is expired
-		public static void RevokeRent(ByteString tokenId)
+		public static void RevokeToken(ByteString tokenId)
 		{
 			ValidateToken(tokenId);
 
@@ -200,12 +193,12 @@ namespace RentFuse
 			// Save updated rent
 			TokenToRent.Put(tokenId, StdLib.Serialize(rent));
 
-			// Fire token closed event
-			OnTokenClosed(tokenId, rent.Owner);
+			// Fire token revoked event
+			OnTokenRevoked(tokenId, rent.Owner);
 		}
 
 		// Close the rent if it's open and the owner doesn't want it anymore or if rented and all concluded
-		public static void CloseRent(ByteString tokenId)
+		public static void CloseToken(ByteString tokenId)
 		{
 			ValidateToken(tokenId);
 

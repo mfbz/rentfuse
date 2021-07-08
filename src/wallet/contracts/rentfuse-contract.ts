@@ -4,6 +4,7 @@ import {
 	DEFAULT_NEO_NETWORK_MAGIC,
 	DEFAULT_NEO_RPC_ADDRESS,
 	DEFAULT_SC_SCRIPTHASH,
+	DEFAULT_GAS_SCRIPTHASH,
 } from '../constants/default';
 import { NEOHelper } from '../helpers/neo-helper';
 import { Rent } from '../interfaces/rent';
@@ -14,7 +15,7 @@ export class RentFuseContract {
 		// The contract object i'll call by using this
 		const contract = RentFuseContract.getContract();
 
-		// Invoke the contract to perform a read (NB: Methods are always camel case and bytestrings are passed as integers! :O)
+		// Invoke the contract to perform a read
 		const result = await contract.testInvoke('getRent', [sc.ContractParam.integer(tokenId)]);
 		// Parse rent into a rent object
 		return RentFuseContract.parseRent(result.stack[0]);
@@ -61,7 +62,8 @@ export class RentFuseContract {
 		return RentFuseContract.parseRentList(result.stack[0]);
 	};
 
-	// price absolute, it's later added gas precision, duration in ms
+	// Price absolute, it's later added gas precision, duration in ms
+	// nftTokenId type is inferred from string value passed, if string passed as string otherwise passed as number
 	static createToken = async ({
 		nftScriptHash,
 		nftTokenId,
@@ -77,27 +79,146 @@ export class RentFuseContract {
 	}) => {
 		// UInt160 NFTScriptHash, ByteString NFTTokenId, BigInteger price, ulong duration
 		const response = await walletContext.invokeFunction(DEFAULT_SC_SCRIPTHASH, 'createToken', [
-			{ type: 'Address', value: nftScriptHash },
-			{ type: 'Integer', value: nftTokenId },
-			{ type: 'Integer', value: Math.ceil(Number(price) * DEFAULT_GAS_PRECISION) },
-			{ type: 'Integer', value: duration },
+			sc.ContractParam.hash160(nftScriptHash),
+			isNaN(+nftTokenId) ? sc.ContractParam.string(nftTokenId) : sc.ContractParam.integer(nftTokenId),
+			sc.ContractParam.integer(Math.ceil(Number(price) * DEFAULT_GAS_PRECISION)),
+			sc.ContractParam.integer(duration),
 		]);
-
-		console.log(response);
 
 		// If error thrown an exception
 		if (response.result.error && response.result.error.message) {
 			throw new Error('An error occurred invoking contract function');
 		}
 
-		// Get txId from response to know wheter it finished processing it
-		const txId = response.result as string;
-		// Search the txId notification with my contract has and correct event
-		const notification = (await NEOHelper.getNotificationsFromTxId(txId)).find(
-			(n: any) => n.contract === DEFAULT_SC_SCRIPTHASH && n.eventname === 'TokenCreated',
+		// Get transaction notification
+		const notification = await NEOHelper.findNotificationFromTxId(
+			response.result,
+			DEFAULT_SC_SCRIPTHASH,
+			'TokenCreated',
 		);
+		return notification !== undefined;
+	};
 
-		// If notification is found everything is good!
+	static withdrawRent = async ({ tokenId, walletContext }: { tokenId: string; walletContext: any }) => {
+		// ByteString tokenId
+		const response = await walletContext.invokeFunction(DEFAULT_SC_SCRIPTHASH, 'withdrawRent', [
+			sc.ContractParam.integer(tokenId),
+		]);
+
+		// If error thrown an exception
+		if (response.result.error && response.result.error.message) {
+			throw new Error('An error occurred invoking contract function');
+		}
+
+		// TODO ADD RENTFUSE METHOD
+		// Get transaction notification
+		const notification = await NEOHelper.findNotificationFromTxId(
+			response.result,
+			DEFAULT_SC_SCRIPTHASH,
+			'RentWithdrawn',
+		);
+		return notification !== undefined;
+	};
+
+	static revokeRent = async ({ tokenId, walletContext }: { tokenId: string; walletContext: any }) => {
+		// ByteString tokenId
+		const response = await walletContext.invokeFunction(DEFAULT_SC_SCRIPTHASH, 'revokeRent', [
+			sc.ContractParam.integer(tokenId),
+		]);
+
+		// If error thrown an exception
+		if (response.result.error && response.result.error.message) {
+			throw new Error('An error occurred invoking contract function');
+		}
+
+		// Get transaction notification
+		const notification = await NEOHelper.findNotificationFromTxId(
+			response.result,
+			DEFAULT_SC_SCRIPTHASH,
+			'TokenClosed',
+		);
+		return notification !== undefined;
+	};
+
+	static closeRent = async ({ tokenId, walletContext }: { tokenId: string; walletContext: any }) => {
+		// ByteString tokenId
+		const response = await walletContext.invokeFunction(DEFAULT_SC_SCRIPTHASH, 'closeRent', [
+			sc.ContractParam.integer(tokenId),
+		]);
+
+		// If error thrown an exception
+		if (response.result.error && response.result.error.message) {
+			throw new Error('An error occurred invoking contract function');
+		}
+
+		// Get transaction notification
+		const notification = await NEOHelper.findNotificationFromTxId(
+			response.result,
+			DEFAULT_SC_SCRIPTHASH,
+			'TokenClosed',
+		);
+		return notification !== undefined;
+	};
+
+	static rentToken = async ({
+		tokenId,
+		amount,
+		walletContext,
+	}: {
+		tokenId: string;
+		amount: number;
+		walletContext: any;
+	}) => {
+		// Get address from walletcontext
+		const fromAddress = walletContext.accounts[0].split('@')[0];
+
+		// ByteString tokenId
+		const response = await walletContext.invokeFunction(DEFAULT_GAS_SCRIPTHASH, 'transfer', [
+			sc.ContractParam.hash160(fromAddress),
+			sc.ContractParam.integer(Math.ceil(Number(amount) * DEFAULT_GAS_PRECISION)),
+			sc.ContractParam.array(sc.ContractParam.integer(0), sc.ContractParam.integer(tokenId)),
+		]);
+
+		// If error thrown an exception
+		if (response.result.error && response.result.error.message) {
+			throw new Error('An error occurred invoking contract function');
+		}
+
+		// Get transaction notification
+		const notification = await NEOHelper.findNotificationFromTxId(
+			response.result,
+			DEFAULT_SC_SCRIPTHASH,
+			'TokenRented',
+		);
+		return notification !== undefined;
+	};
+
+	static payToken = async ({
+		tokenId,
+		amount,
+		walletContext,
+	}: {
+		tokenId: string;
+		amount: number;
+		walletContext: any;
+	}) => {
+		// Get address from walletcontext
+		const fromAddress = walletContext.accounts[0].split('@')[0];
+
+		// ByteString tokenId
+		const response = await walletContext.invokeFunction(DEFAULT_GAS_SCRIPTHASH, 'transfer', [
+			sc.ContractParam.hash160(fromAddress),
+			sc.ContractParam.integer(Math.ceil(Number(amount) * DEFAULT_GAS_PRECISION)),
+			sc.ContractParam.array(sc.ContractParam.integer(1), sc.ContractParam.integer(tokenId)),
+		]);
+
+		// If error thrown an exception
+		if (response.result.error && response.result.error.message) {
+			throw new Error('An error occurred invoking contract function');
+		}
+
+		// Get transaction notification
+		const notification = await NEOHelper.findNotificationFromTxId(response.result, DEFAULT_SC_SCRIPTHASH, 'TokenPaid');
 		return notification !== undefined;
 	};
 
@@ -110,6 +231,9 @@ export class RentFuseContract {
 
 	// Accept a stack item to get a rent object from it
 	private static parseRent = (item: { type: any; value?: any }) => {
+		// buffer.Buffer.from(item.value[0].value, 'base64').toString('hex')
+		console.log(item.value);
+
 		if (Array.isArray(item.value) && item.value.length == 13) {
 			return {
 				tokenId: buffer.Buffer.from(item.value[0].value, 'base64').toString('hex'),

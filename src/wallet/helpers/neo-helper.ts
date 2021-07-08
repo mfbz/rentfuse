@@ -4,6 +4,15 @@ import { DEFAULT_NEO_RPC_ADDRESS } from '../constants/default';
 export class NEOHelper {
 	private static readonly READ_LOG_FREQUENCY = 1000; //ms
 
+	static findNotificationFromTxId = async (txId: string, scriptHash: string, eventName: string) => {
+		// Get transaction notifications
+		const notifications = await NEOHelper.getNotificationsFromTxId(txId);
+		// Return selected one
+		return notifications.find(
+			(n: any) => n.contract === scriptHash && n.eventname === eventName,
+		);
+	};
+
 	static getNotificationsFromTxId = async (txId: string) => {
 		// Get rpc client to do calls
 		const rpcClient = NEOHelper.getRPCClient();

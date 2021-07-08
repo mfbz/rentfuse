@@ -13,7 +13,7 @@
 	"dependencies": {
 		"@ant-design/icons": "^4.6.2",
 		"@cityofzion/neon-js": "^5.0.0-next.12",
-		"@cityofzion/wallet-connect-sdk-react": "0.0.11",
+		"@cityofzion/wallet-connect-sdk-react": "0.0.14",
 		"@walletconnect/client": "^2.0.0-alpha.42",
 		"@walletconnect/qrcode-modal": "^2.0.0-alpha.20",
 		"@walletconnect/types": "^2.0.0-alpha.42",

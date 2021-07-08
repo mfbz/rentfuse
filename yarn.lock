@@ -219,17 +219,17 @@
     "@cityofzion/neon-api" "^5.0.0-next.12"
     "@cityofzion/neon-core" "^5.0.0-next.12"
 
-"@cityofzion/wallet-connect-sdk-core@^0.0.11":
-  version "0.0.11"
-  resolved "http://localhost:4873/@cityofzion%2fwallet-connect-sdk-core/-/wallet-connect-sdk-core-0.0.11.tgz#04cefa85b3d9be7e12fcf1125c352ac1ce67c700"
-  integrity sha512-P/NkDQMgIFReE8oajFLVWrq90g1CPEIVdAHgobWvhVE5eeYHdTzW3szOz5Tm3ISrvnAtLS/FHNSu26poD4s8tA==
+"@cityofzion/wallet-connect-sdk-core@^0.0.14":
+  version "0.0.14"
+  resolved "http://localhost:4873/@cityofzion%2fwallet-connect-sdk-core/-/wallet-connect-sdk-core-0.0.14.tgz#fd6c41f26871afcf506c7ac79c5638e2d097f11c"
+  integrity sha512-maJtmX3JX57wTjjHZ4fs2LIs7Ydy00xpHD32Io5RvzgPdFY+UOwiSg8PQhSKdl55Urk98Imw55wVBcFFPT4JIw==
 
-"@cityofzion/wallet-connect-sdk-react@0.0.11":
-  version "0.0.11"
-  resolved "http://localhost:4873/@cityofzion%2fwallet-connect-sdk-react/-/wallet-connect-sdk-react-0.0.11.tgz#31f86a957754cefa8b77b93015496fe6d0f898c4"
-  integrity sha512-errfmOx0AF75c4vLkmB0ErSdgZb7BxcRZ64NgmyLvkew3d5gEL2AQqHCd+FMuTRI+4WZt0/sWJ7OU3+5qhfZsw==
+"@cityofzion/wallet-connect-sdk-react@0.0.14":
+  version "0.0.14"
+  resolved "http://localhost:4873/@cityofzion%2fwallet-connect-sdk-react/-/wallet-connect-sdk-react-0.0.14.tgz#64824241fb812b696c6688fe1a89d6f941428829"
+  integrity sha512-XlGaMRQt1FDUge6W3Z20RwS0Ct6tSbdmR/v6CzUOUupdbCmlhWDlmtCZts3W2mjNcpuLBHkn9Akyo6ljosjh0Q==
   dependencies:
-    "@cityofzion/wallet-connect-sdk-core" "^0.0.11"
+    "@cityofzion/wallet-connect-sdk-core" "^0.0.14"
 
 "@ctrl/tinycolor@^3.4.0":
   version "3.4.0"

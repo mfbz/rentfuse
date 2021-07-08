@@ -1,4 +1,5 @@
 export interface NFT {
+	symbol: string;
 	scriptHash: string;
 	tokenId: string;
 	properties: {

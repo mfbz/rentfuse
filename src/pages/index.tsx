@@ -31,9 +31,7 @@ export default function IndexPage({}: {}) {
 		try {
 			// Get needed data calling the contract
 			const symbol = await NEP11Contract.getSymbol({ scriptHash: nftScriptHash });
-			console.log(symbol);
 			const properties = await NEP11Contract.getProperties({ scriptHash: nftScriptHash, tokenId: nftTokenId });
-			console.log(properties);
 
 			return {
 				symbol,

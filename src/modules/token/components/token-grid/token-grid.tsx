@@ -20,13 +20,13 @@ export const TokenGrid = React.memo(function TokenGrid({
 			<List
 				grid={{
 					gutter: 24,
-					column: 4,
+					column: 3,
 					xs: 1,
 					sm: 1,
 					md: 2,
 					lg: 3,
-					xl: 4,
-					xxl: 4,
+					xl: 3,
+					xxl: 3,
 				}}
 				dataSource={rents}
 				rowKey={(item) => item.tokenId}

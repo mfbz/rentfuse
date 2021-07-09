@@ -48,6 +48,15 @@ export const ApplicationCreateTokenButton = React.memo(function ApplicationCreat
 		setRent(values);
 	}, []);
 
+	// This way to prevent continous nft loading when writing
+	const _onLoadNFT = useCallback(async(nftScriptHash: string, nftTokenId: string)=> {
+		// Only when at least full scripthash inserted
+		if (rent.nftScriptHash.length === 40 && rent.nftTokenId.length) {
+			return await onLoadNFT(nftScriptHash, nftTokenId);
+		}
+		return null;
+	}, [rent, onLoadNFT]);
+
 	return (
 		<div>
 			<Button size={'large'} shape={'round'} onClick={() => setDrawerVisible(true)}>
@@ -73,7 +82,7 @@ export const ApplicationCreateTokenButton = React.memo(function ApplicationCreat
 			>
 				<Row gutter={24}>
 					<Col span={12}>
-						<TokenCard rent={rent} onLoadNFT={onLoadNFT} />
+						<TokenCard rent={rent} onLoadNFT={_onLoadNFT} />
 					</Col>
 
 					<Col span={12}>

@@ -1,14 +1,37 @@
-import { Layout, Space } from 'antd';
-import React from 'react';
-import { useWallet } from '../../../wallet';
+import { Layout, Space, message } from 'antd';
+import React, { useCallback } from 'react';
+import { useWallet, RentFuseContract } from '../../../wallet';
 import { ApplicationLogo } from '../application-logo';
 import { ApplicationAccountButton } from './components/application-account-button';
 import { ApplicationWalletButton } from './components/application-wallet-button';
+import { ApplicationCreateTokenButton } from './components/application-create-token-button';
+import { NEP11Contract } from '../../../wallet/contracts/nep11-contract';
 
 export const HEADER_HEIGHT = 80;
 
 export const ApplicationHeader = React.memo(function ApplicationHeader({}: {}) {
-	const { walletAccount, loadingSession, connectWallet, disconnectWallet } = useWallet();
+	const { walletContext, walletAccount, loadingSession, connectWallet, disconnectWallet } = useWallet();
+
+	const onLoadNFT = useCallback(async (nftScriptHash: string, nftTokenId: string) => {
+		try {
+			// Get needed data calling the contract
+			return await NEP11Contract.getNFT({ scriptHash: nftScriptHash, tokenId: nftTokenId });
+		} catch (error) {
+			message.error('An error occurred loading nft data.');
+		}
+
+		return null;
+	}, []);
+	const onCreateToken = useCallback(
+		async (nftScriptHash: string, nftTokenId: string, price: number, duration: number) => {
+			try {
+				await RentFuseContract.createToken({ nftScriptHash, nftTokenId, price, duration, walletContext });
+			} catch (error) {
+				message.error('An error occurred creating the token.');
+			}
+		},
+		[walletContext],
+	);
 
 	return (
 		<div>
@@ -17,9 +40,10 @@ export const ApplicationHeader = React.memo(function ApplicationHeader({}: {}) {
 					<div className={'a-header-content'}>
 						<ApplicationLogo />
 
-						<Space>
+						<Space size={24}>
 							{walletAccount ? (
 								<>
+									<ApplicationCreateTokenButton onLoadNFT={onLoadNFT} onCreateToken={onCreateToken} />
 									<ApplicationAccountButton account={walletAccount} onDisconnect={disconnectWallet} />
 								</>
 							) : (

@@ -15,11 +15,10 @@ export const ApplicationAccountButton = React.memo(function ApplicationAccountBu
 	// The pages where i can navigate from this button
 	const links = useMemo(
 		() => [
-			{ id: 0, title: 'Account', route: '/account' },
-			{ id: 0, title: 'My listings', route: '/listings' },
-			{ id: 0, title: 'My rents', route: '/rents' },
+			{ id: 0, title: 'My listings', route: '/owner/' + account },
+			{ id: 1, title: 'My rents', route: '/tenant/' + account },
 		],
-		[],
+		[account],
 	);
 
 	return (

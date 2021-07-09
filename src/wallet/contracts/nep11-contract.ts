@@ -1,9 +1,22 @@
 import Neon, { sc, u } from '@cityofzion/neon-js';
 import { DEFAULT_NEO_NETWORK_MAGIC, DEFAULT_NEO_RPC_ADDRESS } from '../constants/default';
-import * as buffer from 'buffer';
+import { NFT } from '../interfaces/nft';
 
 export class NEP11Contract {
-	static getSymbol = async ({ scriptHash }: { scriptHash: string }) => {
+	static getNFT = async ({ scriptHash, tokenId }: { scriptHash: string, tokenId: string }) => {
+		// Get needed data calling the contract
+		const symbol = await NEP11Contract.getSymbol({ scriptHash });
+		const properties = await NEP11Contract.getProperties({ scriptHash, tokenId });
+
+		return {
+			symbol,
+			scriptHash,
+			tokenId,
+			properties,
+		} as NFT;
+	};
+
+	private static getSymbol = async ({ scriptHash }: { scriptHash: string }) => {
 		// The contract object from scripthash
 		const contract = new Neon.experimental.SmartContract(Neon.u.HexString.fromHex(scriptHash), {
 			networkMagic: DEFAULT_NEO_NETWORK_MAGIC,
@@ -16,7 +29,7 @@ export class NEP11Contract {
 		return u.HexString.fromBase64(result.stack[0].value as string).toAscii();
 	};
 
-	static getProperties = async ({ scriptHash, tokenId }: { scriptHash: string; tokenId: string }) => {
+	private static getProperties = async ({ scriptHash, tokenId }: { scriptHash: string; tokenId: string }) => {
 		// The contract object from scripthash
 		const contract = new Neon.experimental.SmartContract(Neon.u.HexString.fromHex(scriptHash), {
 			networkMagic: DEFAULT_NEO_NETWORK_MAGIC,

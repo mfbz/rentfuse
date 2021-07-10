@@ -54,7 +54,7 @@ export const TokenCard = React.memo(function TokenCard({
 							<Typography.Text>{'Price'}</Typography.Text>
 							<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
 								<Icon component={GasIcon} style={{ marginRight: 8 }} />
-								<Typography.Text strong={true}>{Math.ceil(Number(rent.price) / DEFAULT_GAS_PRECISION)}</Typography.Text>
+								<Typography.Text strong={true}>{(Number(rent.price) / DEFAULT_GAS_PRECISION)}</Typography.Text>
 							</div>
 						</div>
 					</div>

@@ -60,7 +60,7 @@ export const TokenCard = React.memo(function TokenCard({
 					</div>
 
 					<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center' }}>
-						<Typography.Text type={'secondary'}>
+						<Typography.Text type={'secondary'} style={{ fontSize: '0.8em' }}>
 							{durationInDays + ' ' + (durationInDays > 1 ? 'days' : 'day')}
 						</Typography.Text>
 					</div>

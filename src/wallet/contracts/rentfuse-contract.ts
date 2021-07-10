@@ -173,7 +173,7 @@ export class RentFuseContract {
 
 		// ByteString tokenId
 		const response = await walletContext.invokeFunction(DEFAULT_GAS_SCRIPTHASH, 'transfer', [
-			sc.ContractParam.hash160(wallet.getScriptHashFromAddress(fromAddress)),
+			{ type: 'Address', value: fromAddress },
 			{ type: 'ScriptHash', value: DEFAULT_SC_SCRIPTHASH },
 			sc.ContractParam.integer(amount),
 			sc.ContractParam.array(sc.ContractParam.integer(0), sc.ContractParam.integer(tokenId)),
@@ -207,7 +207,7 @@ export class RentFuseContract {
 
 		// ByteString tokenId
 		const response = await walletContext.invokeFunction(DEFAULT_GAS_SCRIPTHASH, 'transfer', [
-			sc.ContractParam.hash160(wallet.getScriptHashFromAddress(fromAddress)),
+			{ type: 'Address', value: fromAddress },
 			{ type: 'ScriptHash', value: DEFAULT_SC_SCRIPTHASH },
 			sc.ContractParam.integer(amount),
 			sc.ContractParam.array(sc.ContractParam.integer(1), sc.ContractParam.integer(tokenId)),

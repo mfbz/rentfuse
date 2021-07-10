@@ -1,9 +1,9 @@
-import { message, Row, Col, Image, Card, Typography, Modal } from 'antd';
+import { message, Row, Col, Image, Card, Typography, Badge, Tag } from 'antd';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { ApplicationPage } from '../../application';
-import { Rent, RentFuseContract, useWallet, DEFAULT_GAS_PRECISION } from '../../wallet';
+import { Rent, RentFuseContract, useWallet, DEFAULT_GAS_PRECISION, StateType } from '../../wallet';
 import { NEP11Contract } from '../../wallet/contracts/nep11-contract';
 import { NFT } from '../../wallet/interfaces/nft';
 import Link from 'next/link';
@@ -19,7 +19,7 @@ export default function IndexPage() {
 	}, [router]);
 
 	// If no token id redirect to 404 page
-	useEffect(()=> {
+	useEffect(() => {
 		if (tokenId === undefined) {
 			router.push('/404');
 		}
@@ -121,6 +121,21 @@ export default function IndexPage() {
 		await connectWallet();
 	}, [connectWallet]);
 
+	// Data needed to tint the tag
+	const tag = useMemo(() => {
+		if (rent) {
+			switch (rent.state) {
+				case StateType.Open:
+					return ['#52c41a', 'Open'];
+				case StateType.Rented:
+					return ['#1890ff', 'Rented'];
+				case StateType.Closed:
+					return ['#f5222d', 'Closed'];
+			}
+		}
+		return ['', ''];
+	}, [rent]);
+
 	return (
 		<>
 			<Head>
@@ -131,7 +146,11 @@ export default function IndexPage() {
 				<Row gutter={24}>
 					<Col xs={24} sm={24} md={24} lg={10} xl={10}>
 						<div style={{ display: 'flex', flexDirection: 'column' }}>
-							<Card loading={!nft} cover={<Image src={nft ? nft.properties.image : undefined} preview={false} />} />
+							<Card loading={!nft} cover={<Image src={nft ? nft.properties.image : undefined} preview={false} />}>
+								<div>
+									<Tag color={tag[0]}>{tag[1]}</Tag>
+								</div>
+							</Card>
 
 							<Card title={<Typography.Text strong={true}>{'Description'}</Typography.Text>} style={{ marginTop: 24 }}>
 								<div>
@@ -151,7 +170,7 @@ export default function IndexPage() {
 							</div>
 
 							<div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-								<Typography.Text style={{marginRight:8}}>{'Owned by'}</Typography.Text>
+								<Typography.Text style={{ marginRight: 8 }}>{'Owned by'}</Typography.Text>
 
 								<Link href={'/owner?address=' + (rent ? rent.owner : undefined)}>
 									<a className={'g-link-no-border'}>
@@ -161,13 +180,17 @@ export default function IndexPage() {
 							</div>
 
 							<Card title={<Typography.Text strong={true}>{'Price'}</Typography.Text>} style={{ marginTop: 24 }}>
-								<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
+								<div
+									style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}
+								>
 									<Icon component={GasIcon} style={{ fontSize: '42px', marginRight: 16 }} />
-									<Typography.Title level={2} style={{marginBottom:0}}>
+									<Typography.Title level={2} style={{ marginBottom: 0 }}>
 										{rent ? Math.ceil(Number(rent.price) / DEFAULT_GAS_PRECISION) : '-'}
 									</Typography.Title>
 
-									<Typography.Text style={{ marginLeft: 24, marginTop:16, marginBottom:0 }}>{'/ day'}</Typography.Text>
+									<Typography.Text style={{ marginLeft: 24, marginTop: 16, marginBottom: 0 }}>
+										{'/ day'}
+									</Typography.Text>
 								</div>
 							</Card>
 
@@ -193,4 +216,3 @@ export default function IndexPage() {
 		</>
 	);
 }
-

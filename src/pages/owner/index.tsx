@@ -15,8 +15,8 @@ export default function IndexPage() {
 	}, [router]);
 
 	// If no address redirect to 404 page
-	useEffect(()=> {
-		if (address === undefined) {
+	useEffect(() => {
+		if (router.isReady && address === undefined) {
 			router.push('/404');
 		}
 	}, [router, address]);
@@ -64,13 +64,13 @@ export default function IndexPage() {
 			</Head>
 
 			<ApplicationPage>
-				<div style={{display: 'flex', flexDirection: 'column'}}>
+				<div style={{ display: 'flex', flexDirection: 'column' }}>
 					<div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-						<Typography.Text style={{marginRight:8}}>{'Listings of'}</Typography.Text>
+						<Typography.Text style={{ marginRight: 8 }}>{'Listings of'}</Typography.Text>
 						<Typography.Text strong={true}>{address}</Typography.Text>
 					</div>
 
-					<TokenGrid rents={rents} onLoadNFT={onLoadNFT} onClickRent={onClickRent} style={{marginTop:24}} />
+					<TokenGrid rents={rents} onLoadNFT={onLoadNFT} onClickRent={onClickRent} style={{ marginTop: 24 }} />
 				</div>
 
 				<style jsx>{``}</style>

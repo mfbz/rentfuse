@@ -20,7 +20,7 @@ export default function IndexPage() {
 
 	// If no token id redirect to 404 page
 	useEffect(() => {
-		if (tokenId === undefined) {
+		if (router.isReady && tokenId === undefined) {
 			router.push('/404');
 		}
 	}, [router, tokenId]);

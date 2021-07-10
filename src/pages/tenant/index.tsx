@@ -14,6 +14,13 @@ export default function AddressPage({}: {}) {
 		return router.query.address as string;
 	}, [router]);
 
+	// If no address redirect to 404 page
+	useEffect(()=> {
+		if (address === undefined) {
+			router.push('/404');
+		}
+	}, [router, address]);
+
 	const [rents, setRents] = useState<Rent[]>([]);
 
 	useEffect(() => {
@@ -26,7 +33,9 @@ export default function AddressPage({}: {}) {
 			}
 		};
 
-		loadRents(address);
+		if (address) {
+			loadRents(address);
+		}
 	}, [address]);
 
 	const onLoadNFT = useCallback(async (nftScriptHash: string, nftTokenId: string) => {
@@ -41,7 +50,7 @@ export default function AddressPage({}: {}) {
 	}, []);
 	const onClickRent = useCallback(
 		(rent: Rent) => {
-			router.push('/token/' + rent.tokenId);
+			router.push('/token?id=' + rent.tokenId);
 		},
 		[router],
 	);

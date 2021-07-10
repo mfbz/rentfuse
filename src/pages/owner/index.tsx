@@ -7,12 +7,19 @@ import { Rent, RentFuseContract } from '../../wallet';
 import { useRouter } from 'next/router';
 import { NEP11Contract } from '../../wallet/contracts/nep11-contract';
 
-export default function AddressPage({}: {}) {
+export default function IndexPage({}: {}) {
 	const router = useRouter();
 	// Extract address from router query param
 	const address = useMemo(() => {
 		return router.query.address as string;
 	}, [router]);
+
+	// If no address redirect to 404 page
+	useEffect(()=> {
+		if (address === undefined) {
+			router.push('/404');
+		}
+	}, [router, address]);
 
 	const [rents, setRents] = useState<Rent[]>([]);
 
@@ -23,10 +30,14 @@ export default function AddressPage({}: {}) {
 				setRents(_rents);
 			} catch (error) {
 				message.error('An error occurred loading rents.');
+				console.error(error);
 			}
 		};
 
-		loadRents(address);
+		console.log(address);
+		if (address) {
+			loadRents(address);
+		}
 	}, [address]);
 
 	const onLoadNFT = useCallback(async (nftScriptHash: string, nftTokenId: string) => {
@@ -41,7 +52,7 @@ export default function AddressPage({}: {}) {
 	}, []);
 	const onClickRent = useCallback(
 		(rent: Rent) => {
-			router.push('/token/' + rent.tokenId);
+			router.push('/token?id=' + rent.tokenId);
 		},
 		[router],
 	);

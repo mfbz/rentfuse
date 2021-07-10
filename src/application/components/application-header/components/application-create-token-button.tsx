@@ -59,7 +59,7 @@ export const ApplicationCreateTokenButton = React.memo(function ApplicationCreat
 
 	return (
 		<div>
-			<Button size={'large'} shape={'round'} onClick={() => setDrawerVisible(true)}>
+			<Button type={'primary'} size={'large'} shape={'round'} onClick={() => setDrawerVisible(true)}>
 				{'Lend NFT'}
 			</Button>
 

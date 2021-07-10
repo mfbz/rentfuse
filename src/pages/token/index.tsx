@@ -11,12 +11,19 @@ import Icon from '@ant-design/icons';
 import { GasIcon } from '../../common/icons/gas-icon';
 import { TokenActionBar } from '../../modules/token';
 
-export default function TokenIdPage({}: {}) {
+export default function IndexPage({}: {}) {
 	const router = useRouter();
 	// Extract tokenId from router query param
 	const tokenId = useMemo(() => {
-		return router.query.tokenId as string;
+		return router.query.id as string;
 	}, [router]);
+
+	// If no token id redirect to 404 page
+	useEffect(()=> {
+		if (tokenId === undefined) {
+			router.push('/404');
+		}
+	}, [router, tokenId]);
 
 	// Data needed to populate the page
 	const [rent, setRent] = useState<Rent | null>(null);
@@ -32,7 +39,9 @@ export default function TokenIdPage({}: {}) {
 	}, []);
 
 	useEffect(() => {
-		onLoadRent(tokenId);
+		if (tokenId !== undefined) {
+			onLoadRent(tokenId);
+		}
 	}, [tokenId, onLoadRent]);
 
 	useEffect(() => {
@@ -124,9 +133,9 @@ export default function TokenIdPage({}: {}) {
 						<div style={{ display: 'flex', flexDirection: 'column' }}>
 							<Card loading={!nft} cover={<Image src={nft ? nft.properties.image : undefined} preview={false} />} />
 
-							<Card title={'Description'} style={{ marginTop: 24 }}>
+							<Card title={<Typography.Text strong={true}>{'Description'}</Typography.Text>} style={{ marginTop: 24 }}>
 								<div>
-									<Typography>{nft ? nft.properties.description : undefined}</Typography>
+									<Typography.Text>{nft ? nft.properties.description : undefined}</Typography.Text>
 								</div>
 							</Card>
 						</div>
@@ -134,7 +143,7 @@ export default function TokenIdPage({}: {}) {
 					<Col xs={24} sm={24} md={24} lg={14} xl={14}>
 						<div style={{ display: 'flex', flexDirection: 'column' }}>
 							<div>
-								<Typography>{nft ? nft.symbol : undefined}</Typography>
+								<Typography.Text>{nft ? nft.symbol : undefined}</Typography.Text>
 							</div>
 
 							<div>
@@ -142,23 +151,23 @@ export default function TokenIdPage({}: {}) {
 							</div>
 
 							<div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-								<Typography>{'Owned by'}</Typography>
+								<Typography.Text style={{marginRight:8}}>{'Owned by'}</Typography.Text>
 
-								<Link href={'/owner/' + (rent ? rent.owner : undefined)}>
+								<Link href={'/owner?address=' + (rent ? rent.owner : undefined)}>
 									<a className={'g-link-no-border'}>
-										<Typography>{rent ? rent.owner : undefined}</Typography>
+										<Typography.Text>{rent ? rent.owner : undefined}</Typography.Text>
 									</a>
 								</Link>
 							</div>
 
-							<Card title={'Price'} style={{ marginTop: 24 }}>
-								<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-									<Icon component={GasIcon} style={{ fontSize: '30px', marginRight: 16 }} />
-									<Typography.Title level={3}>
+							<Card title={<Typography.Text strong={true}>{'Price'}</Typography.Text>} style={{ marginTop: 24 }}>
+								<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
+									<Icon component={GasIcon} style={{ fontSize: '42px', marginRight: 16 }} />
+									<Typography.Title level={2} style={{marginBottom:0}}>
 										{rent ? Math.ceil(Number(rent.price) / DEFAULT_GAS_PRECISION) : '-'}
 									</Typography.Title>
 
-									<Typography style={{ marginLeft: 24 }}>{'/ day'}</Typography>
+									<Typography.Text style={{ marginLeft: 24, marginTop:16, marginBottom:0 }}>{'/ day'}</Typography.Text>
 								</div>
 							</Card>
 

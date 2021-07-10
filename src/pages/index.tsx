@@ -37,7 +37,7 @@ export default function IndexPage({}: {}) {
 	}, []);
 	const onClickRent = useCallback(
 		(rent: Rent) => {
-			router.push('/token/' + rent.tokenId);
+			router.push('/token?id=' + rent.tokenId);
 		},
 		[router],
 	);

@@ -65,7 +65,15 @@ export default function IndexPage() {
 
 			<ApplicationPage>
 				<div style={{ display: 'flex', flexDirection: 'column' }}>
-					<div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+					<div
+						style={{
+							display: 'flex',
+							flexDirection: 'row',
+							flexWrap: 'wrap',
+							alignItems: 'center',
+							overflow: 'hidden',
+						}}
+					>
 						<Typography.Text style={{ marginRight: 8 }}>{'Listings of'}</Typography.Text>
 						<Typography.Text strong={true}>{address}</Typography.Text>
 					</div>

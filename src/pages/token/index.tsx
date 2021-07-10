@@ -161,7 +161,10 @@ export default function IndexPage() {
 								</div>
 							</Card>
 
-							<Card title={<Typography.Text strong={true}>{'Status'}</Typography.Text>} style={{ marginTop: 24 }}>
+							<Card
+								title={<Typography.Text strong={true}>{'Status'}</Typography.Text>}
+								style={{ marginTop: 24, marginBottom: 24 }}
+							>
 								<div>
 									<Typography.Text type={status[0] as any}>{status[1]}</Typography.Text>
 								</div>
@@ -178,7 +181,15 @@ export default function IndexPage() {
 								<Typography.Title>{nft ? '#' + nft.tokenId + ' ' + nft.properties.name : undefined}</Typography.Title>
 							</div>
 
-							<div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+							<div
+								style={{
+									display: 'flex',
+									flexDirection: 'row',
+									flexWrap: 'wrap',
+									alignItems: 'center',
+									overflow: 'hidden',
+								}}
+							>
 								<Typography.Text style={{ marginRight: 8 }}>{'Owned by'}</Typography.Text>
 
 								<Link href={'/owner?address=' + (rent ? rent.owner : undefined)}>

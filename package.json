@@ -1,6 +1,9 @@
 {
 	"name": "rentfuse",
-	"version": "1.0.0",
+	"version": "1.0.1",
+	"description": "Peer to peer renting of Neo N3 NFTs",
+	"license": "Apache-2.0",
+	"author": "mfbz",
 	"scripts": {
 		"web:dev": "next",
 		"web:build": "next build",

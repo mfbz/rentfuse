@@ -121,19 +121,26 @@ export default function IndexPage() {
 		await connectWallet();
 	}, [connectWallet]);
 
-	// Data needed to tint the tag
-	const tag = useMemo(() => {
+	// Data needed for the status
+	const status = useMemo(() => {
 		if (rent) {
 			switch (rent.state) {
 				case StateType.Open:
-					return ['#52c41a', 'Open'];
+					return ['success', 'Open'];
 				case StateType.Rented:
-					return ['#1890ff', 'Rented'];
+					return ['warning', 'Rented'];
 				case StateType.Closed:
-					return ['#f5222d', 'Closed'];
+					return ['danger', 'Closed'];
 			}
 		}
 		return ['', ''];
+	}, [rent]);
+
+	const durationInDays = useMemo(() => {
+		if (rent) {
+			return Math.ceil(rent.duration / (1000 * 60 * 60 * 24));
+		}
+		return '';
 	}, [rent]);
 
 	return (
@@ -151,6 +158,12 @@ export default function IndexPage() {
 							<Card title={<Typography.Text strong={true}>{'Description'}</Typography.Text>} style={{ marginTop: 24 }}>
 								<div>
 									<Typography.Text>{nft ? nft.properties.description : undefined}</Typography.Text>
+								</div>
+							</Card>
+
+							<Card title={<Typography.Text strong={true}>{'Status'}</Typography.Text>} style={{ marginTop: 24 }}>
+								<div>
+									<Typography.Text type={status[0] as any}>{status[1]}</Typography.Text>
 								</div>
 							</Card>
 						</div>
@@ -187,6 +200,12 @@ export default function IndexPage() {
 									<Typography.Text style={{ marginLeft: 24, marginTop: 16, marginBottom: 0 }}>
 										{'/ day'}
 									</Typography.Text>
+								</div>
+							</Card>
+
+							<Card title={<Typography.Text strong={true}>{'Duration'}</Typography.Text>} style={{ marginTop: 24 }}>
+								<div>
+									<Typography.Text>{durationInDays + ' ' + (durationInDays > 1 ? 'days' : 'day')}</Typography.Text>
 								</div>
 							</Card>
 

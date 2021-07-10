@@ -146,11 +146,7 @@ export default function IndexPage() {
 				<Row gutter={24}>
 					<Col xs={24} sm={24} md={24} lg={10} xl={10}>
 						<div style={{ display: 'flex', flexDirection: 'column' }}>
-							<Card loading={!nft} cover={<Image src={nft ? nft.properties.image : undefined} preview={false} />}>
-								<div>
-									<Tag color={tag[0]}>{tag[1]}</Tag>
-								</div>
-							</Card>
+							<Card loading={!nft} cover={<Image src={nft ? nft.properties.image : undefined} preview={false} />} />
 
 							<Card title={<Typography.Text strong={true}>{'Description'}</Typography.Text>} style={{ marginTop: 24 }}>
 								<div>

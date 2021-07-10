@@ -54,13 +54,15 @@ export const TokenCard = React.memo(function TokenCard({
 							<Typography.Text>{'Price'}</Typography.Text>
 							<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
 								<Icon component={GasIcon} style={{ marginRight: 8 }} />
-								<Typography.Text strong={true}>{(Number(rent.price) / DEFAULT_GAS_PRECISION)}</Typography.Text>
+								<Typography.Text strong={true}>{Number(rent.price) / DEFAULT_GAS_PRECISION}</Typography.Text>
 							</div>
 						</div>
 					</div>
 
-					<div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-						<Typography.Text>{durationInDays + ' ' + (durationInDays > 1 ? 'days' : 'day')}</Typography.Text>
+					<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center' }}>
+						<Typography.Text type={'secondary'}>
+							{durationInDays + ' ' + (durationInDays > 1 ? 'days' : 'day')}
+						</Typography.Text>
 					</div>
 				</div>
 			</Card>

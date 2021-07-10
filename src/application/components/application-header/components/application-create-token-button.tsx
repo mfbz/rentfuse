@@ -88,6 +88,8 @@ export const ApplicationCreateTokenButton = React.memo(function ApplicationCreat
 			<Drawer
 				title={<Typography.Text strong={true}>{'Lend NFT'}</Typography.Text>}
 				width={720}
+				closable={!loading}
+				maskClosable={!loading}
 				closeIcon={<Icon component={CloseIcon} />}
 				onClose={() => setDrawerVisible(false)}
 				visible={drawerVisible}

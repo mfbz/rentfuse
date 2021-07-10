@@ -1,4 +1,4 @@
-import { message } from 'antd';
+import { message, Typography } from 'antd';
 import Head from 'next/head';
 import React, { useCallback, useState, useEffect, useMemo } from 'react';
 import { ApplicationPage } from '../../application';
@@ -62,8 +62,13 @@ export default function AddressPage({}: {}) {
 			</Head>
 
 			<ApplicationPage>
-				<div>
-					<TokenGrid rents={rents} onLoadNFT={onLoadNFT} onClickRent={onClickRent} />
+				<div style={{display: 'flex', flexDirection: 'column'}}>
+					<div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+						<Typography.Text style={{marginRight:8}}>{'Listings of'}</Typography.Text>
+						<Typography.Text strong={true}>{address}</Typography.Text>
+					</div>
+					
+					<TokenGrid rents={rents} onLoadNFT={onLoadNFT} onClickRent={onClickRent} style={{marginTop:24}} />
 				</div>
 
 				<style jsx>{``}</style>

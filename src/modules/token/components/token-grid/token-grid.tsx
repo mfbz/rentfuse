@@ -37,6 +37,7 @@ export const TokenGrid = React.memo(function TokenGrid({
 						</List.Item>
 					);
 				}}
+				locale={{emptyText: <div></div>}}
 			/>
 
 			<style jsx>{``}</style>

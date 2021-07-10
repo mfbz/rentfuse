@@ -1,6 +1,7 @@
 import React from 'react';
 import { Rent, StateType } from '../../../../wallet';
 import { Space, Button, Modal } from 'antd';
+import { BigButton } from '../../../../common/components/big-button';
 
 export const TokenActionBar = React.memo(function TokenActionBar({
 	rent,
@@ -28,7 +29,7 @@ export const TokenActionBar = React.memo(function TokenActionBar({
 			<div style={style}>
 				<Space size={24}>
 					{rent.balance > 0 && (
-						<Button
+						<BigButton
 							type={'primary'}
 							shape={'round'}
 							size={'large'}
@@ -37,16 +38,18 @@ export const TokenActionBar = React.memo(function TokenActionBar({
 									title: 'Do you want to withdraw from the rent?',
 									okText: 'Withdraw',
 									cancelText: 'Cancel',
+									centered: true,
+									icon: null,
 									onOk: async () => await onWithdrawToken(rent.tokenId),
 								})
 							}
 						>
 							{'Withdraw'}
-						</Button>
+						</BigButton>
 					)}
 					{(rent.state === StateType.Open ||
 						(rent.state === StateType.Rented && Date.now() > rent.rentedOn + rent.duration)) && (
-						<Button
+						<BigButton
 							type={'primary'}
 							danger={true}
 							shape={'round'}
@@ -57,12 +60,14 @@ export const TokenActionBar = React.memo(function TokenActionBar({
 									okType: 'danger',
 									okText: 'Close',
 									cancelText: 'Cancel',
+									centered: true,
+									icon: null,
 									onOk: async () => await onCloseToken(rent.tokenId),
 								})
 							}
 						>
 							{'Close'}
-						</Button>
+						</BigButton>
 					)}
 					{rent.tenant !== null &&
 						rent.amount <
@@ -70,7 +75,7 @@ export const TokenActionBar = React.memo(function TokenActionBar({
 								(Date.now() > rent.rentedOn + rent.duration
 									? Math.ceil(rent.duration / (1000 * 60 * 60 * 24))
 									: Math.ceil((Date.now() - rent.rentedOn) / (1000 * 60 * 60 * 24))) && (
-							<Button
+							<BigButton
 								type={'primary'}
 								danger={true}
 								shape={'round'}
@@ -81,12 +86,14 @@ export const TokenActionBar = React.memo(function TokenActionBar({
 										okType: 'danger',
 										okText: 'Revoke',
 										cancelText: 'Cancel',
+										centered: true,
+										icon: null,
 										onOk: async () => await onRevokeToken(rent.tokenId),
 									})
 								}
 							>
 								{'Revoke'}
-							</Button>
+							</BigButton>
 						)}
 				</Space>
 
@@ -100,7 +107,7 @@ export const TokenActionBar = React.memo(function TokenActionBar({
 			<div style={style}>
 				<Space size={24}>
 					{rent.state === StateType.Rented && (
-						<Button
+						<BigButton
 							type={'primary'}
 							shape={'round'}
 							size={'large'}
@@ -109,12 +116,14 @@ export const TokenActionBar = React.memo(function TokenActionBar({
 									title: 'Do you want to pay the rent?',
 									okText: 'Pay',
 									cancelText: 'Cancel',
+									centered: true,
+									icon: null,
 									onOk: async () => await onPayToken(rent.tokenId, rent.price),
 								})
 							}
 						>
 							{'Pay'}
-						</Button>
+						</BigButton>
 					)}
 				</Space>
 
@@ -128,7 +137,7 @@ export const TokenActionBar = React.memo(function TokenActionBar({
 			<div style={style}>
 				<Space size={24}>
 					{rent.state === StateType.Open && (
-						<Button
+						<BigButton
 							type={'primary'}
 							shape={'round'}
 							size={'large'}
@@ -137,12 +146,14 @@ export const TokenActionBar = React.memo(function TokenActionBar({
 									title: 'Do you want to rent the nft?',
 									okText: 'Rent',
 									cancelText: 'Cancel',
+									centered: true,
+									icon: null,
 									onOk: async () => await onRentToken(rent.tokenId, rent.price),
 								})
 							}
 						>
 							{'Rent'}
-						</Button>
+						</BigButton>
 					)}
 				</Space>
 
@@ -155,9 +166,9 @@ export const TokenActionBar = React.memo(function TokenActionBar({
 		<div style={style}>
 			<Space size={24}>
 				{rent.state === StateType.Open && (
-					<Button type={'primary'} shape={'round'} size={'large'} onClick={() => onNoAccount()}>
+					<BigButton type={'primary'} shape={'round'} size={'large'} onClick={() => onNoAccount()}>
 						{'Rent'}
-					</Button>
+					</BigButton>
 				)}
 			</Space>
 

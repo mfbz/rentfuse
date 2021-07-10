@@ -79,9 +79,9 @@ export class RentFuseContract {
 	}) => {
 		// UInt160 NFTScriptHash, ByteString NFTTokenId, BigInteger price, ulong duration
 		const response = await walletContext.invokeFunction(DEFAULT_SC_SCRIPTHASH, 'createToken', [
-			sc.ContractParam.hash160(nftScriptHash),
+			{ type: 'ScriptHash', value: nftScriptHash.length === 40 ? ('0x' + nftScriptHash) : nftScriptHash },
 			isNaN(+nftTokenId) ? sc.ContractParam.string(nftTokenId) : sc.ContractParam.integer(nftTokenId),
-			sc.ContractParam.integer(Math.ceil(Number(price) * DEFAULT_GAS_PRECISION)),
+			sc.ContractParam.integer(price),
 			sc.ContractParam.integer(duration),
 		]);
 
@@ -174,8 +174,8 @@ export class RentFuseContract {
 		// ByteString tokenId
 		const response = await walletContext.invokeFunction(DEFAULT_GAS_SCRIPTHASH, 'transfer', [
 			sc.ContractParam.hash160(wallet.getScriptHashFromAddress(fromAddress)),
-			sc.ContractParam.hash160(DEFAULT_SC_SCRIPTHASH),
-			sc.ContractParam.integer(Math.ceil(Number(amount) * DEFAULT_GAS_PRECISION)),
+			{ type: 'ScriptHash', value: DEFAULT_SC_SCRIPTHASH },
+			sc.ContractParam.integer(amount),
 			sc.ContractParam.array(sc.ContractParam.integer(0), sc.ContractParam.integer(tokenId)),
 		]);
 
@@ -208,8 +208,8 @@ export class RentFuseContract {
 		// ByteString tokenId
 		const response = await walletContext.invokeFunction(DEFAULT_GAS_SCRIPTHASH, 'transfer', [
 			sc.ContractParam.hash160(wallet.getScriptHashFromAddress(fromAddress)),
-			sc.ContractParam.hash160(DEFAULT_SC_SCRIPTHASH),
-			sc.ContractParam.integer(Math.ceil(Number(amount) * DEFAULT_GAS_PRECISION)),
+			{ type: 'ScriptHash', value: DEFAULT_SC_SCRIPTHASH },
+			sc.ContractParam.integer(amount),
 			sc.ContractParam.array(sc.ContractParam.integer(1), sc.ContractParam.integer(tokenId)),
 		]);
 

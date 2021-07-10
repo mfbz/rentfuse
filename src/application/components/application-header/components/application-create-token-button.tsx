@@ -36,7 +36,12 @@ export const ApplicationCreateTokenButton = React.memo(function ApplicationCreat
 	const onSubmit = useCallback(
 		async (values) => {
 			setLoading(true);
-			await onCreateToken(values.nftScriptHash, values.nftTokenId, values.price, values.duration);
+			await onCreateToken(
+				values.nftScriptHash, 
+				values.nftTokenId, 
+				Math.ceil(Number(+values.price) * DEFAULT_GAS_PRECISION), 
+				+values.duration * (1000 * 60 * 60 * 24)
+			);
 
 			setLoading(false);
 			setDrawerVisible(false);

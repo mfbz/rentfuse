@@ -1,2 +1,3 @@
-export * from './components/token-grid/token-grid';
-export * from './components/token-action-bar/token-action-bar';
+export * from './components/token-grid';
+export * from './components/token-card';
+export * from './components/token-action-bar';

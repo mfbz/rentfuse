@@ -8,7 +8,7 @@ import { useRouter } from 'next/router';
 
 const NAVIGATE_HOME_DELAY = 5000; // ms
 
-export default function FourZeroFourPage({}: {}) {
+export default function FourZeroFourPage() {
 	// Get router object to automatically go back to home after delay
 	const router = useRouter();
 
@@ -54,9 +54,3 @@ export default function FourZeroFourPage({}: {}) {
 		</>
 	);
 }
-
-export const getStaticProps = async () => {
-	return {
-		props: {},
-	};
-};

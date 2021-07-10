@@ -7,7 +7,7 @@ import { Rent, RentFuseContract } from '../../wallet';
 import { useRouter } from 'next/router';
 import { NEP11Contract } from '../../wallet/contracts/nep11-contract';
 
-export default function AddressPage({}: {}) {
+export default function AddressPage() {
 	const router = useRouter();
 	// Extract address from router query param
 	const address = useMemo(() => {
@@ -76,9 +76,3 @@ export default function AddressPage({}: {}) {
 		</>
 	);
 }
-
-export const getStaticProps = async () => {
-	return {
-		props: {},
-	};
-};

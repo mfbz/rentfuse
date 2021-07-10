@@ -1,1 +1,1 @@
-export * from './article-list';
+export * from './token-card';

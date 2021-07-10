@@ -11,7 +11,7 @@ import Icon from '@ant-design/icons';
 import { GasIcon } from '../../common/icons/gas-icon';
 import { TokenActionBar } from '../../modules/token';
 
-export default function IndexPage({}: {}) {
+export default function IndexPage() {
 	const router = useRouter();
 	// Extract tokenId from router query param
 	const tokenId = useMemo(() => {
@@ -194,8 +194,3 @@ export default function IndexPage({}: {}) {
 	);
 }
 
-export const getStaticProps = async () => {
-	return {
-		props: {},
-	};
-};

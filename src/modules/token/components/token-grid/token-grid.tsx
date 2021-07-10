@@ -20,13 +20,13 @@ export const TokenGrid = React.memo(function TokenGrid({
 			<List
 				grid={{
 					gutter: 24,
-					column: 3,
+					column: 4,
 					xs: 1,
 					sm: 1,
 					md: 2,
 					lg: 3,
-					xl: 3,
-					xxl: 3,
+					xl: 4,
+					xxl: 4,
 				}}
 				dataSource={rents}
 				rowKey={(item) => item.tokenId}
@@ -37,7 +37,7 @@ export const TokenGrid = React.memo(function TokenGrid({
 						</List.Item>
 					);
 				}}
-				locale={{emptyText: <div></div>}}
+				locale={{ emptyText: <div></div> }}
 			/>
 
 			<style jsx>{``}</style>

@@ -1,8 +1,10 @@
-import { Button, Col, DatePicker, Drawer, Form, Input, Row, Select, Space, Typography } from 'antd';
+import { Button, Col, Drawer, Form, Input, Row, Select, Space, Typography } from 'antd';
 import React, { useCallback, useState } from 'react';
 import { TokenCard } from '../../../../modules/token/components/token-card/token-card';
-import { StateType } from '../../../../wallet';
+import { StateType, DEFAULT_GAS_PRECISION } from '../../../../wallet';
 import { NFT } from '../../../../wallet/interfaces/nft';
+import Icon from '@ant-design/icons';
+import { CloseIcon } from '../../../../common/icons/close-icon';
 
 export const ApplicationCreateTokenButton = React.memo(function ApplicationCreateTokenButton({
 	onLoadNFT,
@@ -45,17 +47,32 @@ export const ApplicationCreateTokenButton = React.memo(function ApplicationCreat
 		[form, onCreateToken],
 	);
 	const onValuesChange = useCallback((changedValues: any, values: any) => {
-		setRent(values);
+		// Normalize scripthash if needed
+		let scriptHash = values.nftScriptHash || '';
+		if (scriptHash.length === 42) {
+			// Remove leading '0x'
+			scriptHash = scriptHash.substring(2);
+		}
+
+		setRent(_rent => (
+			{
+				..._rent, 
+				nftScriptHash: scriptHash, 
+				nftTokenId: values.nftTokenId || '',
+				price: values.price !== undefined ? (Math.ceil(Number(+values.price) * DEFAULT_GAS_PRECISION)) : 0,
+				duration: values.duration !== undefined ? (+values.duration * (1000 * 60 * 60 * 24)) : 0
+			}
+		));
 	}, []);
 
 	// This way to prevent continous nft loading when writing
 	const _onLoadNFT = useCallback(async(nftScriptHash: string, nftTokenId: string)=> {
 		// Only when at least full scripthash inserted
-		if (rent.nftScriptHash.length === 40 && rent.nftTokenId.length) {
+		if (nftScriptHash.length === 40 && nftTokenId.length) {
 			return await onLoadNFT(nftScriptHash, nftTokenId);
 		}
 		return null;
-	}, [rent, onLoadNFT]);
+	}, [onLoadNFT]);
 
 	return (
 		<div>
@@ -64,20 +81,23 @@ export const ApplicationCreateTokenButton = React.memo(function ApplicationCreat
 			</Button>
 
 			<Drawer
-				title={'Lend NFT'}
+				title={<Typography.Text strong={true}>{'Lend NFT'}</Typography.Text>}
 				width={720}
+				closeIcon={<Icon component={CloseIcon} />}
 				onClose={() => setDrawerVisible(false)}
 				visible={drawerVisible}
 				bodyStyle={{ paddingBottom: 80 }}
 				footer={
-					<Space size={24} align={'end'}>
-						<Button onClick={() => setDrawerVisible(false)} disabled={loading}>
-							{'Cancel'}
-						</Button>
-						<Button onClick={() => form.submit()} type={'primary'} loading={loading}>
-							{'Lend'}
-						</Button>
-					</Space>
+					<div style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}>
+						<Space size={24} align={'end'}>
+							<Button onClick={() => setDrawerVisible(false)} disabled={loading}>
+								{'Cancel'}
+							</Button>
+							<Button onClick={() => form.submit()} type={'primary'} loading={loading}>
+								{'Lend'}
+							</Button>
+						</Space>
+					</div>
 				}
 			>
 				<Row gutter={24}>

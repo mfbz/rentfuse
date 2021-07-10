@@ -38,11 +38,11 @@ export const TokenActionBar = React.memo(function TokenActionBar({
 							{'Close'}
 						</Button>
 					)}
-					{rent.amount <
+					{(rent.tenant !== null && (rent.amount <
 						rent.price *
 							(Date.now() > rent.rentedOn + rent.duration
 								? Math.ceil(rent.duration / (1000 * 60 * 60 * 24))
-								: Math.ceil((Date.now() - rent.rentedOn) / (1000 * 60 * 60 * 24))) && (
+								: Math.ceil((Date.now() - rent.rentedOn) / (1000 * 60 * 60 * 24))))) && (
 						<Button type={'primary'} danger={true} shape={'round'} size={'large'} onClick={() => onRevokeToken(rent.tokenId)}>
 							{'Revoke'}
 						</Button>

@@ -79,7 +79,7 @@ export class RentFuseContract {
 	}) => {
 		// UInt160 NFTScriptHash, ByteString NFTTokenId, BigInteger price, ulong duration
 		const response = await walletContext.invokeFunction(DEFAULT_SC_SCRIPTHASH, 'createToken', [
-			{ type: 'ScriptHash', value: nftScriptHash.length === 40 ? ('0x' + nftScriptHash) : nftScriptHash },
+			{ type: 'ScriptHash', value: nftScriptHash.length === 40 ? '0x' + nftScriptHash : nftScriptHash },
 			isNaN(+nftTokenId) ? sc.ContractParam.string(nftTokenId) : sc.ContractParam.integer(nftTokenId),
 			sc.ContractParam.integer(price),
 			sc.ContractParam.integer(duration),
@@ -236,8 +236,9 @@ export class RentFuseContract {
 		//console.log(item.value);
 
 		if (Array.isArray(item.value) && item.value.length == 13) {
+			// Parse token id as int and then string because i know that it's a number :D
 			return {
-				tokenId: buffer.Buffer.from(item.value[0].value, 'base64').toString('hex'),
+				tokenId: parseInt('0x' + buffer.Buffer.from(item.value[0].value, 'base64').toString('hex')).toString(),
 				owner: wallet.getAddressFromScriptHash(
 					u.reverseHex(buffer.Buffer.from(item.value[1].value, 'base64').toString('hex')),
 				),

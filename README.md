@@ -1,3 +1,9 @@
+<h1 align="center">
+  <p>This is the Hackathon version of Rentfuse</p>
+  <p>You can find new developments at</p>
+  <p>https://github.com/rentfuse-labs</p>
+</h1>
+
 <p align="center">
   <img width="200" src="./rentfuse_icon.svg">
 </p>
